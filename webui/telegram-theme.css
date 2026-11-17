@@ -1,0 +1,1311 @@
+/* ==========================================================================
+   telegram-theme.css — дизайн-система «как Telegram Web A (telegram-tt)».
+
+   Файл подключается после style.css и переопределяет только оформление:
+   разметка, id и классы, на которые опирается app.js, не меняются.
+   Источник токенов: github.com/Ajaxy/telegram-tt (src/styles/_variables.scss,
+   themes.json, _composer-primitives.scss, компоненты src/components).
+   ========================================================================== */
+
+/* --------------------------------------------------------------- 1. ТОКЕНЫ */
+:root {
+  /* палитра Telegram Web A, тёмная тема (классическая night) */
+  --bg: #0e1621;              /* фон ленты сообщений */
+  --bg-deep: #0b141a;         /* самый тёмный фон (глубина) */
+  --panel: #17212b;           /* сайдбар, шапка чата, композер */
+  --panel-2: #1b2733;         /* карточки, строки настроек */
+  --panel-3: #202c38;         /* тосты, чипы, вложенные панели */
+
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+
+  --text: #ffffff;
+  --text-2: #e9eef3;
+  --muted: #7d8e9e;
+  --dim: #6b7d8d;
+
+  --accent: #64b5ef;          /* акцент для текста/иконок */
+  --accent-solid: #3390ec;    /* «телеграмный» синий для кнопок */
+  --accent-solid-hover: #2b82d9;
+  --accent-soft: rgba(100, 181, 239, 0.14);
+  --accent-ink: #ffffff;
+
+  /* пузыри */
+  --in: #182533;
+  --in-text: #ffffff;
+  --out: #2b5278;
+  --out-text: #ffffff;
+  --bubble-radius: 12px;
+  --bubble-tail-radius: 6px;
+
+  /* активный чат в списке */
+  --chat-active: #2b5278;
+  --chat-active-text: #ffffff;
+
+  --meta: #7d8e9e;
+  --out-meta: rgba(255, 255, 255, 0.62);
+  --link: #64b5ef;
+
+  --input-bg: #242f3d;
+  --hover: rgba(255, 255, 255, 0.06);
+  --hover-strong: rgba(255, 255, 255, 0.1);
+  --chip-bg: #202c38;
+  --code-bg: rgba(0, 0, 0, 0.3);
+  --code-border: rgba(255, 255, 255, 0.07);
+  --code-text: #dfeaf2;
+  --day-bg: rgba(0, 0, 0, 0.28);
+  --day-text: #c3d2de;
+  --file-bg: rgba(255, 255, 255, 0.055);
+  --file-bg-hover: rgba(255, 255, 255, 0.095);
+  --file-ico: linear-gradient(135deg, #4b95d0, #2b5278);
+  --progress-bg: rgba(255, 255, 255, 0.12);
+  --spoiler: #34434f;
+  --spoiler-hover: #3e4e5c;
+  --scroll: rgba(255, 255, 255, 0.16);
+  --scroll-hover: rgba(255, 255, 255, 0.3);
+  --overlay: rgba(0, 0, 0, 0.55);
+  --shadow: 0 14px 44px rgba(0, 0, 0, 0.48);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.22);
+  --shadow-float: 0 4px 18px rgba(0, 0, 0, 0.32);
+  --scroll-button: #22303d;
+  --scroll-button-text: #d7e6f2;
+
+  --danger: #e8665f;
+  --ok: #4fae4e;
+  --warn: #f0b45f;
+  --danger-soft: rgba(232, 102, 95, 0.14);
+  --warn-soft: rgba(240, 180, 95, 0.14);
+  --ok-soft: rgba(79, 174, 78, 0.16);
+
+  --avatar-a: #45b6e8;
+  --avatar-b: #1f8fc4;
+  --avatar-c: #1877a5;
+
+  --radius: 12px;
+  --radius-list: 10px;
+  --radius-modal: 16px;
+  --sidebar-w: 420px;
+  --settings-side: #0e1621;
+
+  /* «обои» чата: едва заметный телеграмный узор + мягкий градиент */
+  --chat-pattern: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.045' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M18 42c10-8 22-8 32 0'/%3E%3Ccircle cx='126' cy='30' r='8'/%3E%3Cpath d='M112 100l10 10 18-22'/%3E%3Cpath d='M44 128c12 0 22 10 22 22'/%3E%3Cpath d='M150 140c-8-10-8-24 0-34'/%3E%3Cpath d='M84 62l7-13 7 13-14 0z'/%3E%3C/g%3E%3C/svg%3E");
+
+  color-scheme: dark;
+}
+
+body.theme-light {
+  --bg: #e6ebee;
+  --bg-deep: #dfe6ea;
+  --panel: #ffffff;
+  --panel-2: #f7f8fa;
+  --panel-3: #f1f2f4;
+
+  --line: rgba(0, 0, 0, 0.08);
+  --line-strong: rgba(0, 0, 0, 0.16);
+
+  --text: #000000;
+  --text-2: #1c2530;
+  --muted: #707579;
+  --dim: #8b949b;
+
+  --accent: #3390ec;
+  --accent-solid: #3390ec;
+  --accent-solid-hover: #2b82d9;
+  --accent-soft: rgba(51, 144, 236, 0.1);
+  --accent-ink: #ffffff;
+
+  --in: #ffffff;
+  --in-text: #000000;
+  --out: #eeffde;
+  --out-text: #000000;
+
+  --chat-active: #3390ec;
+  --chat-active-text: #ffffff;
+
+  --meta: #8a9aa5;
+  --out-meta: #4fae4e;          /* как в telegram-tt: --color-message-meta-own */
+  --link: #3390ec;
+
+  --input-bg: #f4f4f5;
+  --hover: rgba(0, 0, 0, 0.045);
+  --hover-strong: rgba(0, 0, 0, 0.08);
+  --chip-bg: #ffffff;
+  --code-bg: #f1f6fa;
+  --code-border: rgba(0, 0, 0, 0.07);
+  --code-text: #1c2f3f;
+  --day-bg: rgba(0, 0, 0, 0.1);
+  --day-text: #4b6478;
+  --file-bg: rgba(0, 0, 0, 0.045);
+  --file-bg-hover: rgba(0, 0, 0, 0.08);
+  --file-ico: linear-gradient(135deg, #4a9bd8, #2b78ad);
+  --progress-bg: rgba(0, 0, 0, 0.1);
+  --spoiler: #c7d6e1;
+  --spoiler-hover: #b9cbd9;
+  --scroll: rgba(0, 0, 0, 0.18);
+  --scroll-hover: rgba(0, 0, 0, 0.32);
+  --overlay: rgba(10, 22, 32, 0.42);
+  --shadow: 0 14px 40px rgba(24, 48, 70, 0.18);
+  --shadow-soft: 0 1px 2px rgba(24, 48, 70, 0.12);
+  --shadow-float: 0 3px 12px rgba(24, 48, 70, 0.14);
+  --scroll-button: #ffffff;
+  --scroll-button-text: #4b6478;
+
+  --danger: #d9534c;
+  --ok: #2f9e63;
+  --warn: #c8871c;
+  --danger-soft: rgba(217, 83, 76, 0.1);
+  --warn-soft: rgba(200, 135, 28, 0.12);
+  --ok-soft: rgba(47, 158, 99, 0.12);
+
+  --file-ico: linear-gradient(135deg, #4a9bd8, #2b78ad);
+  --settings-side: #f4f4f5;
+  --chat-pattern: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='none' stroke='%23000000' stroke-opacity='0.05' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M18 42c10-8 22-8 32 0'/%3E%3Ccircle cx='126' cy='30' r='8'/%3E%3Cpath d='M112 100l10 10 18-22'/%3E%3Cpath d='M44 128c12 0 22 10 22 22'/%3E%3Cpath d='M150 140c-8-10-8-24 0-34'/%3E%3Cpath d='M84 62l7-13 7 13-14 0z'/%3E%3C/g%3E%3C/svg%3E");
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------- 2. БАЗОВАЯ ТИПОГРАФИКА */
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14.5px;
+  line-height: 1.35;
+  background: var(--bg);
+  color: var(--text-2);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+b, strong { font-weight: 600; }
+
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-thumb {
+  background: var(--scroll);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scroll-hover); background-clip: content-box; }
+
+::selection { background: var(--accent-soft); color: var(--text); }
+
+svg { fill: currentColor; }
+
+/* --------------------------------------------------------- 3. КАРКАС / СЕТКА */
+.app { background: var(--bg-deep); }
+
+/* Сайдбар: широкий, плоский, как в Telegram Web A (~420px) */
+.sidebar {
+  width: var(--sidebar-w);
+  flex: 0 0 var(--sidebar-w);
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  transition: background-color 0.18s ease;
+}
+
+/* ------------------------------------------------------------- 4. САЙДБАР */
+.sidebar-head {
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  gap: 10px;
+  padding: 0 2px 10px;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #51b2e8, #3390ec 60%, #2b7fd1);
+  box-shadow: 0 2px 8px rgba(51, 144, 236, 0.3);
+}
+.brand-logo svg { width: 19px; height: 19px; }
+
+.brand-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text);
+}
+.conn { font-size: 12px; margin-top: 1px; color: var(--muted); }
+.conn-dot { width: 6px; height: 6px; }
+
+/* Компактные круглые действия в шапке сайдбара (как в Telegram) */
+.brand-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  margin-left: 2px;
+}
+.brand-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--muted);
+}
+.brand-btn:hover { background: var(--hover); color: var(--text); }
+.brand-btn:active { transform: scale(0.94); }
+.brand-btn svg { width: 20px; height: 20px; }
+
+/* Поиск — как в Telegram: пилюля на «вторичном» фоне без рамки */
+.search-box {
+  height: 40px;
+  padding: 0 32px 0 12px;
+  background: var(--input-bg);
+  border: 1px solid transparent;
+  border-radius: 20px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.search-box:focus-within {
+  border-color: var(--accent-solid);
+  box-shadow: none;
+  background: var(--input-bg);
+}
+.search-ico { width: 17px; height: 17px; margin-right: 9px; }
+.search-box input { font-size: 14.5px; }
+.search-box input::placeholder { color: var(--muted); }
+.search-clear { width: 25px; height: 25px; right: 7px; }
+.search-clear:hover { background: var(--hover); }
+
+/* Список чатов занимает всю высоту: нижнего блока действий больше нет */
+.chat-list {
+  padding: 6px 8px 8px;
+  scrollbar-gutter: stable;
+}
+.chat-list:empty { flex: 0 0 0; padding: 0; overflow: hidden; }
+.chat-list-empty:not([hidden]) { flex: 1 1 auto; }
+
+.chat-item {
+  gap: 10px;
+  padding: 7px 9px;
+  min-height: 68px;
+  border-radius: var(--radius-list);
+  transition: background-color 0.14s ease;
+  animation: none;
+}
+.chat-item:hover { background: var(--hover); }
+.chat-item.active { background: var(--chat-active); }
+.chat-item.active::before { display: none; }
+
+.chat-item-main { gap: 2px; }
+.chat-item-top { gap: 8px; align-items: center; }
+
+.chat-item-name {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--text);
+}
+
+.chat-item-time {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.chat-item.active .chat-item-time { color: var(--chat-active-text); opacity: 0.8; }
+
+.chat-item-bottom { gap: 6px; }
+
+.chat-item-last {
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+.chat-item.active .chat-item-last {
+  color: var(--chat-active-text);
+  opacity: 0.88;
+}
+
+.chat-item.active .chat-item-name { color: var(--chat-active-text); }
+
+.unread-badge {
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: var(--accent-solid);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: none;
+}
+.chat-item.active .unread-badge {
+  background: #fff;
+  color: var(--chat-active);
+}
+
+/* Аватары: 54px в списке чатов, круглые */
+.avatar.chat-avatar { width: 54px; height: 54px; font-size: 18px; }
+.avatar.chat-avatar svg { width: 24px; height: 24px; }
+.avatar { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18); }
+
+.chat-list-empty { color: var(--muted); }
+.cle-icon { width: 48px; height: 48px; background: var(--hover); }
+.cle-title { font-size: 14px; }
+
+/* --------------------------------------------------------- 5. ШАПКА ЧАТА */
+.chat { background: var(--bg); }
+
+.chat-head {
+  height: 56px;
+  padding: 0 12px;
+  gap: 8px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.peer { gap: 10px; }
+.avatar.avatar-head { width: 42px; height: 42px; font-size: 16px; }
+.peer-text { gap: 0; }
+
+.peer-name {
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.peer-sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  color: var(--muted);
+}
+.icon-btn:hover { background: var(--hover); color: var(--text); }
+.icon-btn svg { width: 21px; height: 21px; }
+
+/* В style.css .icon-btn{display:grid} идёт позже .burger/.mobile-only/.sidebar-close,
+   из-за чего служебные кнопки видны на десктопе. Возвращаем корректное поведение. */
+.burger,
+.mobile-only,
+.sidebar-close { display: none; }
+
+/* -------------------------------------------------- 6. ЛЕНТА И «ОБОИ» ЧАТА */
+.messages-wrap {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(1200px 600px at 12% -10%, rgba(51, 144, 236, 0.07), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(100, 181, 239, 0.05), transparent 55%),
+    var(--chat-pattern);
+  background-size: auto, auto, 180px 180px;
+  background-position: center, center, center;
+}
+
+body.theme-light .messages-wrap {
+  background-image:
+    radial-gradient(1200px 600px at 12% -10%, rgba(51, 144, 236, 0.06), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(255, 255, 255, 0.5), transparent 55%),
+    var(--chat-pattern);
+}
+
+.messages {
+  padding: 16px 20px 12px;
+  background: transparent;
+}
+
+.feed { min-height: 100%; }
+
+/* Кнопка «загрузить раньше» и разделители дат */
+.load-older {
+  border-radius: 12px;
+  background: var(--day-bg);
+  color: var(--day-text);
+  font-size: 12.5px;
+  padding: 5px 12px;
+  backdrop-filter: blur(6px);
+}
+.load-older:hover { background: var(--hover-strong); color: var(--text-2); }
+
+.day-chip {
+  margin: 12px auto 10px;
+  padding: 4px 11px;
+  border-radius: 12px;
+  background: var(--day-bg);
+  color: var(--day-text);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  backdrop-filter: blur(6px);
+}
+
+/* --------------------------------------------------------------- 7. ПУЗЫРИ */
+.row {
+  margin: 0;
+  padding: 1px 0;
+  animation: msgIn 0.16s ease-out;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+.row.g-first { margin-top: 8px; }
+
+.bubble {
+  position: relative;
+  max-width: min(74%, 468px);
+  min-width: 60px;
+  padding: 7px 10px 6px;
+  border-radius: var(--bubble-radius);
+  background: var(--in);
+  color: var(--in-text);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+  transition: box-shadow 0.15s ease, background-color 0.18s ease;
+}
+.row.out .bubble {
+  background: var(--out);
+  color: var(--out-text);
+}
+.bubble:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--line);
+}
+
+/* «Хвостик» у последнего сообщения в группе — геометрия из telegram-tt
+   (MessageAppendix: 9×18, нижний выступ 1px, путь как в telegram-tt). */
+.row.in.g-last .bubble { border-bottom-left-radius: var(--bubble-tail-radius); }
+.row.out.g-last .bubble { border-bottom-right-radius: var(--bubble-tail-radius); }
+
+.row.g-last .bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  /* 10px при маске 9px: 1px заходит под пузырь, чтобы не было шва на скруглении */
+  width: 10px;
+  height: 18px;
+  background-color: currentColor;
+  pointer-events: none;
+}
+.row.in.g-last .bubble::after {
+  left: -9px;
+  color: var(--in);
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+}
+.row.out.g-last .bubble::after {
+  right: -9px;
+  color: var(--out);
+  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
+}
+
+/* Медиа-пузыри: ровные поля, хвостик не мешает */
+.bubble.media-only { padding: 4px; }
+.bubble.media-only::after { display: none; }
+
+/* Фото/видео не растягивают пузырь на всю ширину: ограничиваем по размеру медиа */
+.bubble:has(.photo-media),
+.bubble:has(.video-media),
+.bubble:has(.video-note) { max-width: min(340px, 74%); }
+
+.bubble .body {
+  font-size: 15px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.bubble .body:empty { display: none; }
+
+/* Метаданные: время, «изм.», галочки */
+.bubble .meta {
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.2;
+  color: var(--meta);
+}
+.row.out .bubble .meta { color: var(--out-meta); }
+.bubble .meta .edited { font-style: normal; opacity: 0.9; }
+.bubble .meta .tick svg { width: 15px; height: 15px; }
+.bubble .meta .tick { color: var(--accent); }
+.row.out .bubble .meta .tick { color: var(--out-meta); }
+.row.out .bubble .meta .tick.read { color: #6fd3ff; }
+body.theme-light .row.out .bubble .meta .tick.read { color: #4fae4e; }
+.bubble .meta .tick.fail { color: var(--danger); }
+
+.bubble.error { border: 1px solid var(--danger); }
+.msg-error {
+  margin-top: 4px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* Пересланное / ответ */
+.fwd {
+  gap: 5px;
+  margin: 0 0 4px;
+  padding-left: 0;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--accent);
+}
+.fwd svg { width: 14px; height: 14px; }
+.fwd-user { color: var(--muted); }
+.row.out .fwd { color: #9ed4f5; }
+body.theme-light .row.out .fwd { color: #2f8a48; }
+
+@keyframes flashBubble {
+  0% { box-shadow: 0 0 0 2px var(--accent-solid), 0 0 22px var(--accent-soft); }
+  100% { box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16); }
+}
+
+/* ------------------------------------------------------------ 8. MARKDOWN */
+.md-p { margin: 0 0 2px; }
+.md-p:last-child { margin-bottom: 0; }
+.md-p + .md-p { margin-top: 4px; }
+
+.md-h { font-weight: 600; margin: 6px 0 3px; line-height: 1.3; }
+.md-h1 { font-size: 18px; }
+.md-h2 { font-size: 16.5px; }
+.md-h3 { font-size: 15.5px; }
+.md-h4, .md-h5, .md-h6 { font-size: 15px; }
+
+.md-quote {
+  margin: 4px 0;
+  padding: 3px 0 3px 10px;
+  border-left: 3px solid var(--accent-solid);
+  background: var(--accent-soft);
+  border-radius: 0 6px 6px 0;
+}
+
+.md-code {
+  font-family: "Cascadia Mono", "Consolas", "SF Mono", monospace;
+  font-size: 13px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 5px;
+  padding: 1px 4px;
+}
+.md-pre {
+  margin: 5px 0;
+  border-radius: 9px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+}
+.md-pre pre { padding: 9px 11px; font-size: 13px; line-height: 1.45; color: var(--code-text); }
+.md-copy { border-radius: 7px; }
+
+.md-list { margin: 3px 0; padding-left: 20px; }
+.md-hr { border-top: 1px solid var(--line); margin: 8px 0; }
+.md-link { color: var(--accent); text-decoration: none; }
+.md-link:hover { text-decoration: underline; }
+
+.spoiler { border-radius: 4px; background: var(--spoiler); }
+.spoiler:hover { background: var(--spoiler-hover); }
+.spoiler.open { background: transparent; }
+
+/* ------------------------------------------------------- 9. РАСШИФРОВКА */
+.tr { margin-top: 6px; }
+.tr-head {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.tr-toggle { color: var(--accent); font-size: 11.5px; }
+.tr-body {
+  margin-top: 4px;
+  padding: 6px 9px;
+  border-left: 2px solid var(--accent-solid);
+  border-radius: 0 8px 8px 0;
+  background: var(--accent-soft);
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.tr-btn {
+  padding: 5px 10px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.tr-btn:hover { background: var(--hover-strong); }
+.tr-error { font-size: 12px; color: var(--danger); }
+
+/* ------------------------------------------------------------- 10. МЕДИА */
+.media { max-width: 100%; }
+
+.media img.photo {
+  max-width: min(320px, 100%);
+  max-height: 280px;
+  border-radius: 9px;
+  cursor: zoom-in;
+  background: var(--code-bg);
+}
+.media video {
+  max-width: min(320px, 100%);
+  max-height: 320px;
+  border-radius: 9px;
+  background: #000;
+}
+.media.video-note video {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+}
+.media.sticker img { max-width: 170px; max-height: 170px; }
+
+/* Заметная кнопка скачивания (фото/видео) */
+.media-dl {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--accent-solid);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+  color: #fff;
+}
+.media-dl:hover {
+  background: var(--accent-solid-hover);
+  filter: none;
+  transform: translateY(-1px);
+}
+.media-dl svg { width: 20px; height: 20px; }
+
+.media-placeholder {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--file-bg);
+  font-size: 13px;
+  color: var(--muted);
+}
+.media-placeholder svg { width: 19px; height: 19px; }
+
+.retry-btn {
+  padding: 4px 9px;
+  border-radius: 8px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.spinner {
+  border: 2px solid var(--line);
+  border-top-color: var(--accent-solid);
+}
+
+/* -------------------------------------------------------------- 11. ФАЙЛЫ */
+.file-card {
+  gap: 10px;
+  min-width: 236px;
+  max-width: 350px;
+  padding: 7px 9px;
+  border-radius: 10px;
+  background: var(--file-bg);
+}
+.file-card:hover { background: var(--file-bg-hover); }
+
+.file-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--file-ico);
+}
+.file-ico svg { width: 20px; height: 20px; }
+
+.file-name { font-size: 14px; font-weight: 500; }
+.file-size { font-size: 12px; color: var(--muted); }
+
+/* Заметная кнопка скачивания файла */
+.file-dl {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-solid);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-solid) 35%, transparent);
+  color: #fff;
+}
+.file-dl:hover { background: var(--accent-solid-hover); filter: none; transform: translateY(-1px); }
+.file-dl svg { width: 20px; height: 20px; }
+
+/* ---------------------------------------------------------- 12. АУДИО/ГОЛОС */
+.audio-card {
+  gap: 10px;
+  min-width: 250px;
+  max-width: 340px;
+  padding: 6px 8px 6px 6px;
+  border-radius: 12px;
+  background: var(--file-bg);
+}
+.audio-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent-solid);
+  color: #fff;
+}
+.audio-btn:hover { background: var(--accent-solid-hover); filter: none; }
+.audio-btn svg { width: 18px; height: 18px; }
+.audio-title { font-size: 13.5px; }
+.wave { height: 18px; gap: 2px; }
+.wave i { background: var(--meta); opacity: 0.55; border-radius: 2px; }
+.wave i.on { background: var(--accent-solid); opacity: 1; }
+.row.out .wave i { background: rgba(255, 255, 255, 0.45); }
+.row.out .wave i.on { background: #fff; }
+body.theme-light .row.out .wave i { background: #7cb96a; }
+body.theme-light .row.out .wave i.on { background: #3f9d4b; }
+.audio-dur { font-size: 11.5px; color: var(--muted); }
+
+/* Кнопка скачивания аудио — заметная */
+.audio-dl {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--accent-solid);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent-solid) 30%, transparent);
+  color: #fff;
+}
+.audio-dl:hover { background: var(--accent-solid-hover); filter: none; }
+.audio-dl svg { width: 18px; height: 18px; }
+
+/* ------------------------------------------------------- 13. ЗАГРУЗКА ФАЙЛА */
+.upload-card {
+  min-width: 236px;
+  max-width: 330px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--file-bg);
+}
+.upload-row { font-size: 13px; }
+.upload-pct { font-size: 12px; color: var(--muted); }
+.progress { height: 4px; border-radius: 999px; background: var(--progress-bg); }
+.progress > i { background: var(--accent-solid); }
+
+/* ------------------------------------------------------------- 14. КОМПОЗЕР */
+.composer {
+  padding: 0 16px 16px;
+  background: transparent;
+  border-top: 0;
+  position: relative;
+}
+
+/* Панель форматирования — лёгкие чипы над полем */
+.fmt-bar {
+  margin: 0 6px 6px;
+  gap: 2px;
+  padding: 0;
+  opacity: 0.72;
+}
+.composer:focus-within .fmt-bar { opacity: 1; }
+.fmt-btn {
+  min-width: 28px;
+  height: 26px;
+  padding: 0 7px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.fmt-btn:hover { background: var(--hover); color: var(--text); }
+.fmt-btn:active { background: var(--accent-soft); color: var(--accent); }
+.fmt-sep { height: 13px; background: var(--line); }
+.fmt-hint { font-size: 11.5px; color: var(--dim); }
+
+/* Само поле: пилюля как в Telegram Web */
+.composer-box {
+  align-items: flex-end;
+  gap: 6px;
+  padding: 6px 6px 6px 10px;
+  background: var(--panel);
+  border: 0;
+  border-radius: 22px;
+  box-shadow: var(--shadow-float);
+  transition: box-shadow 0.15s ease, background-color 0.18s ease;
+}
+.composer-box:focus-within {
+  border: 0;
+  box-shadow: var(--shadow-float), 0 0 0 2px var(--accent-soft);
+}
+
+#composerInput {
+  min-height: 28px;
+  max-height: 160px;
+  padding: 8px 2px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--text-2);
+}
+#composerInput::placeholder { color: var(--muted); }
+
+.composer-box .attach,
+.composer-box .icon-btn {
+  width: 38px;
+  height: 38px;
+  color: var(--muted);
+}
+.composer-box .attach:hover { background: var(--hover); color: var(--text); }
+
+/* Кнопка отправки: круг 44px, синяя */
+.send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--accent-solid);
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent-solid) 34%, transparent);
+  color: #fff;
+}
+.send-btn svg { width: 20px; height: 20px; }
+.send-btn:hover {
+  background: var(--accent-solid-hover);
+  filter: none;
+  box-shadow: 0 3px 14px color-mix(in srgb, var(--accent-solid) 40%, transparent);
+}
+.send-btn:active { transform: scale(0.94); }
+.send-btn:disabled {
+  background: var(--panel-3);
+  color: var(--dim);
+  opacity: 0.9;
+  box-shadow: none;
+}
+
+/* Прикреплённые файлы */
+.attach-bar { margin: 0 2px 8px; gap: 8px; }
+.chip {
+  padding: 4px 6px 4px 4px;
+  border-radius: 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+}
+.chip img, .chip .chip-ico { width: 34px; height: 34px; border-radius: 8px; }
+.chip .chip-name { font-size: 13px; max-width: 160px; }
+.chip .chip-size { font-size: 11.5px; }
+
+/* ------------------------------------------------------ 15. ПЛАВАЮЩИЕ КНОПКИ */
+.scroll-down {
+  right: 20px;
+  bottom: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--scroll-button);
+  color: var(--scroll-button-text);
+  box-shadow: var(--shadow-float);
+}
+.scroll-down svg { width: 21px; height: 21px; }
+.scroll-down .badge {
+  min-width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: var(--accent-solid);
+  font-size: 11px;
+}
+
+/* Пустые состояния */
+.overlay { padding: 24px; }
+.empty-card { color: var(--muted); }
+.empty-logo {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #51b2e8, #3390ec 60%, #2b7fd1);
+  box-shadow: 0 6px 24px rgba(51, 144, 236, 0.3);
+}
+.empty-card h2 { font-size: 18px; font-weight: 600; color: var(--text); }
+.empty-card p { font-size: 14px; line-height: 1.45; }
+.empty-app { font-size: 11px; letter-spacing: 1.2px; }
+
+/* --------------------------------------------------------------- 16. КНОПКИ */
+.btn {
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  gap: 8px;
+}
+.btn.primary {
+  background: var(--accent-solid);
+  color: var(--accent-ink);
+  box-shadow: none;
+}
+.btn.primary:hover { background: var(--accent-solid-hover); filter: none; }
+.btn.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--line-strong);
+}
+.btn.ghost:hover { background: var(--hover); }
+.btn.danger { background: var(--danger-soft); color: var(--danger); }
+.btn.small { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
+
+/* ----------------------------------------------------------------- 17. ТОСТЫ */
+.toasts { right: 16px; bottom: 16px; }
+.toast {
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 0;
+  background: var(--panel-3);
+  color: var(--text-2);
+  box-shadow: var(--shadow);
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+.toast.error { border-left: 3px solid var(--danger); }
+.toast.success { border-left: 3px solid var(--ok); }
+.toast.info { border-left: 3px solid var(--accent-solid); }
+
+/* -------------------------------------------------------------- 18. МОДАЛКИ */
+.modal { padding: 24px; }
+.modal-veil {
+  background: var(--overlay);
+  backdrop-filter: blur(3px);
+}
+.modal-card {
+  border: 0;
+  border-radius: var(--radius-modal);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.modal-head {
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.modal-head h2 { font-size: 17px; font-weight: 600; }
+.modal-sub { font-size: 12.5px; color: var(--muted); margin-top: 1px; }
+.modal-foot { padding: 10px 16px 14px; border-top: 1px solid var(--line); }
+
+/* --------------------------------------------------- 19. НАСТРОЙКИ (модалка) */
+.settings-card { width: min(860px, 100%); }
+
+.settings-layout { background: var(--panel); }
+
+.settings-tabs {
+  width: 208px;
+  flex: 0 0 208px;
+  padding: 10px 8px;
+  gap: 2px;
+  border-right: 1px solid var(--line);
+  background: var(--settings-side);
+}
+.settings-tab {
+  padding: 9px 11px;
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+  gap: 10px;
+  white-space: nowrap;
+}
+.settings-tab svg { width: 18px; height: 18px; }
+.settings-tab:hover { background: var(--hover); color: var(--text); }
+.settings-tab.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.settings-panes { padding: 16px 20px 22px; }
+.pane-head { margin-bottom: 10px; }
+.pane-head h3 { font-size: 15.5px; font-weight: 600; color: var(--text); }
+.muted { font-size: 13px; line-height: 1.4; color: var(--muted); }
+.hint { font-size: 12px; line-height: 1.45; color: var(--dim); margin-top: 10px; }
+.field { margin-top: 14px; }
+.field-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.input {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--input-bg);
+  color: var(--text-2);
+  font-size: 14px;
+}
+.input:focus {
+  border-color: var(--accent-solid);
+  box-shadow: none;
+  background: var(--input-bg);
+}
+select.input {
+  background-position: calc(100% - 17px) 17px, calc(100% - 12px) 17px;
+}
+
+/* Строки-переключатели: как строки настроек Telegram, без «карточек» */
+.switch-row {
+  margin: 0;
+  padding: 12px 2px;
+  gap: 12px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  transition: background-color 0.14s ease;
+}
+.switch-row:last-of-type { border-bottom: 0; }
+.switch-row:hover { background: transparent; border-color: var(--line); }
+.switch-text { gap: 2px; }
+.switch-title { font-size: 14px; font-weight: 500; color: var(--text-2); }
+.switch-sub { font-size: 12.5px; line-height: 1.35; color: var(--muted); }
+
+.switch {
+  width: 40px;
+  height: 24px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+.switch::after {
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.switch-input:checked + .switch { background: var(--accent-solid); }
+.switch-input:checked + .switch::after { left: 19px; }
+
+/* Выбор темы */
+.theme-choice { gap: 12px; margin-top: 12px; }
+.theme-card {
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+}
+.theme-card:hover { border-color: var(--accent-solid); transform: none; }
+.theme-card.active { border-color: var(--accent-solid); box-shadow: 0 0 0 1px var(--accent-solid); }
+.theme-preview { height: 96px; border-radius: 8px; border: 0; }
+.tp-side { position: relative; width: 32%; flex: 0 0 32%; }
+.tp-side::before,
+.tp-side::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  height: 13px;
+  border-radius: 4px;
+}
+.tp-side::before { top: 9px; background: rgba(255, 255, 255, 0.1); }
+.tp-side::after { top: 27px; background: rgba(51, 144, 236, 0.4); }
+.tp-light .tp-side::before { background: rgba(0, 0, 0, 0.07); }
+.tp-light .tp-side::after { background: rgba(51, 144, 236, 0.22); }
+.tp-main { padding: 9px 8px; gap: 6px; }
+.tp-head { width: 52%; height: 5px; border-radius: 3px; }
+.tp-bubble { height: 13px; border-radius: 6px; }
+.tp-bubble.tp-short { width: 40%; }
+.tp-dark { background: #0e1621; }
+.tp-dark .tp-side { background: #17212b; }
+.tp-dark .tp-head { background: rgba(255, 255, 255, 0.2); }
+.tp-dark .tp-bubble { background: #182533; }
+.tp-dark .tp-out { background: #2b5278; }
+.tp-light { background: #e6ebee; }
+.tp-light .tp-side { background: #ffffff; }
+.tp-light .tp-head { background: rgba(0, 0, 0, 0.18); }
+.tp-light .tp-bubble { background: #ffffff; }
+.tp-light .tp-out { background: #eeffde; }
+.theme-card-foot { padding: 8px 4px 2px; }
+.theme-card-name { font-size: 13.5px; font-weight: 500; }
+.theme-card-sub { font-size: 12px; color: var(--muted); }
+.theme-check { width: 20px; height: 20px; border-color: var(--line-strong); }
+.theme-card.active .theme-check { background: var(--accent-solid); border-color: transparent; }
+
+/* Расшифровка */
+.asr-config { margin-top: 4px; }
+.asr-status { font-size: 12px; }
+.asr-status.ok { color: var(--ok); }
+.asr-status.warn { color: var(--warn); }
+.asr-status.err { color: var(--danger); }
+.asr-line { margin-top: 8px; gap: 8px; }
+.btn-row { margin-top: 10px; gap: 8px; }
+
+/* Пользователи */
+.settings-users { margin-top: 12px; gap: 0; }
+.user-row {
+  padding: 10px 2px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+}
+.user-row:last-child { border-bottom: 0; }
+.user-name { font-size: 14px; font-weight: 500; }
+.user-sub { font-size: 12.5px; color: var(--muted); }
+.list-empty {
+  padding: 14px 12px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.add-user-row { gap: 8px; }
+
+/* О приложении */
+.about-hero {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  gap: 12px;
+}
+.about-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #51b2e8, #3390ec 60%, #2b7fd1);
+}
+.about-name { font-size: 15px; font-weight: 600; }
+.about-sub { font-size: 12.5px; color: var(--muted); }
+
+.facts {
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--line);
+  gap: 1px;
+}
+.fact {
+  padding: 10px 12px;
+  background: var(--panel-2);
+  font-size: 13px;
+}
+.fact dt { color: var(--muted); }
+.fact dd { font-weight: 400; color: var(--text-2); }
+
+/* --------------------------------------------------- 20. ПОИСК ПОЛЬЗОВАТЕЛЯ */
+.find-card { width: min(560px, 100%); }
+.find-search { padding: 12px 16px 6px; }
+.find-list { padding: 4px 8px 8px; }
+.person-row { padding: 9px 8px; border-radius: 10px; gap: 11px; }
+.person-name { font-size: 14px; font-weight: 500; }
+.person-sub { font-size: 12.5px; }
+.person-add .btn { padding: 6px 12px; font-size: 13px; }
+.find-empty { color: var(--muted); }
+.find-loading { color: var(--muted); font-size: 13px; }
+
+/* --------------------------------------------------------------- 21. LIGHTBOX */
+.lightbox { background: rgba(3, 7, 11, 0.86); backdrop-filter: blur(6px); }
+.lightbox img { border-radius: 8px; box-shadow: 0 16px 60px rgba(0, 0, 0, 0.55); }
+.lb-close {
+  width: 44px;
+  height: 44px;
+  background: rgba(255, 255, 255, 0.14);
+}
+.lb-close:hover { background: rgba(255, 255, 255, 0.24); }
+.lb-download {
+  padding: 10px 18px;
+  border-radius: 12px;
+  background: var(--accent-solid);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.42);
+}
+.lb-download:hover { background: var(--accent-solid-hover); filter: none; }
+
+/* ------------------------------------------------------------- 22. DRAG&DROP */
+.dropzone { background: rgba(5, 10, 15, 0.72); }
+.dropzone-inner {
+  padding: 30px 44px;
+  border: 2px dashed var(--accent-solid);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+.dropzone-inner svg { fill: var(--accent); }
+
+/* ------------------------------------------------------------- 23. АДАПТИВ */
+@media (max-width: 1400px) {
+  :root { --sidebar-w: 380px; }
+}
+@media (max-width: 1180px) {
+  :root { --sidebar-w: 340px; }
+}
+
+@media (max-width: 900px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: min(88vw, 360px);
+    max-width: calc(100vw - 40px);
+    flex-basis: auto;
+    border-right: 0;
+    box-shadow: 16px 0 44px rgba(0, 0, 0, 0.45);
+    transform: translateX(-104%);
+    transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.3, 1);
+    z-index: 30;
+  }
+  body.sidebar-open .sidebar { transform: none; }
+  .sidebar-close { display: grid; }
+  .burger { display: grid; }
+  .mobile-only { display: grid; }
+
+  .chat-head { height: 54px; padding: 0 8px 0 4px; }
+  .peer-name { font-size: 15px; }
+  .composer { padding: 0 10px 12px; }
+  .composer-box { border-radius: 20px; }
+  .messages { padding: 12px 12px 8px; }
+
+  .settings-layout { flex-direction: column; }
+  .settings-tabs {
+    width: 100%;
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 4px;
+    padding: 8px 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    overflow-x: auto;
+  }
+  .settings-tab { flex: 0 0 auto; padding: 8px 11px; }
+  .settings-panes { padding: 14px 16px 20px; }
+  .settings-card { max-height: min(92dvh, 900px); }
+  .modal { padding: 14px; }
+}
+
+@media (max-width: 600px) {
+  .messages { padding: 10px 10px 6px; }
+  .bubble { max-width: 88%; }
+  .bubble .body { font-size: 14.5px; }
+  .composer { padding: 0 8px 10px; }
+  .fmt-hint { display: none; }
+  .peer-name { max-width: 52vw; }
+  .modal { padding: 8px; }
+  .modal-card { border-radius: 14px; }
+  .theme-preview { height: 84px; }
+  .toasts { right: 10px; bottom: 10px; left: 10px; max-width: none; }
+  .toast { width: 100%; }
+  .media img.photo { max-width: min(300px, 100%); max-height: 260px; }
+  .media video { max-height: 300px; }
+  .audio-card, .file-card { min-width: 0; width: 100%; max-width: 340px; }
+  .user-row { flex-wrap: wrap; }
+  .user-actions { width: 100%; justify-content: flex-start; }
+  .user-actions .btn { flex: 1 1 auto; }
+}
+
+@media (max-width: 430px) {
+  .theme-choice { grid-template-columns: 1fr; }
+  .add-user-row { flex-direction: column; }
+  .add-user-row .btn { width: 100%; }
+  .settings-tab { padding: 8px 10px; font-size: 13px; gap: 7px; }
+  .settings-tab svg { width: 17px; height: 17px; }
+  .fact { flex-direction: column; gap: 2px; }
+  .fact dd { text-align: left; }
+}
+
+/* ------------------------------------------------------ 24. ДОСТУПНОСТЬ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

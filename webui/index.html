@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#0b141a" id="metaTheme">
+<title>telegram_chats_bot — чат</title>
+<link rel="icon" type="image/png" href="/static/icon.png">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="telegram-theme.css">
+</head>
+<body class="theme-dark">
+<script>
+  try {
+    var savedTheme = localStorage.getItem('tcb_theme');
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      document.body.className = 'theme-' + savedTheme;
+    }
+  } catch (e) {}
+</script>
+
+<svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <symbol id="i-plane" viewBox="0 0 24 24"><path d="M2.01 21 23 12 2.01 3 2 10l15 2-15 2z"/></symbol>
+  <symbol id="i-attach" viewBox="0 0 24 24"><path d="M16.5 6v11.5a4 4 0 0 1-8 0V5a2.5 2.5 0 0 1 5 0v10.5a1 1 0 0 1-2 0V6H10v9.5a2.5 2.5 0 0 0 5 0V5a4 4 0 0 0-8 0v12.5a5.5 5.5 0 0 0 11 0V6h-1.5z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5v-2z"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3 3.5-4.5 4.5 6H5l3.5-4.5z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M3.9 12a3.1 3.1 0 0 1 3.1-3.1h4V7H7a5 5 0 0 0 0 10h4v-1.9H7A3.1 3.1 0 0 1 3.9 12zM8 13h8v-2H8v2zm9-6h-4v1.9h4a3.1 3.1 0 0 1 0 6.2h-4V17h4a5 5 0 0 0 0-10z"/></symbol>
+  <symbol id="i-forward" viewBox="0 0 24 24"><path d="M14 5.5V2l8 7-8 7v-3.5c-5 0-8.7 1.7-11 5.5.8-5.6 4.2-11.5 11-12.5z"/></symbol>
+  <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 5h16v2H4V5zm0 6h16v2H4v-2zm0 6h10v2H4v-2z"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2.5a1 1 0 0 1 1 1V23a1 1 0 1 1-2 0v-2.5a1 1 0 0 1 1-1zm0-19a1 1 0 0 1 1 1V4a1 1 0 1 1-2 0V1.5a1 1 0 0 1 1-1zM3.5 11a1 1 0 1 1 0 2H1a1 1 0 0 1 0-2h2.5zm19.5 1a1 1 0 0 1-1 1h-2.5a1 1 0 1 1 0-2H23a1 1 0 0 1 1 1zM5.6 4.2a1 1 0 0 1 1.4 0l1.8 1.8a1 1 0 0 1-1.4 1.4L5.6 5.6a1 1 0 0 1 0-1.4zm11.6 11.6a1 1 0 0 1 1.4 0l1.8 1.8a1 1 0 0 1-1.4 1.4l-1.8-1.8a1 1 0 0 1 0-1.4zM5.6 19.8a1 1 0 0 1 0-1.4l1.8-1.8a1 1 0 0 1 1.4 1.4l-1.8 1.8a1 1 0 0 1-1.4 0zM17.2 7.4a1 1 0 0 1 0-1.4l1.8-1.8a1 1 0 1 1 1.4 1.4l-1.8 1.8a1 1 0 0 1-1.4 0z"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12.3 2a1 1 0 0 1 .8 1.6 7.2 7.2 0 0 0 9.3 9.4 1 1 0 0 1 1.3 1.2A10 10 0 1 1 11.6 2.2c.2-.1.5-.2.7-.2z"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.48.48 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></symbol>
+  <symbol id="i-user-plus" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></symbol>
+  <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M17.65 6.35A8 8 0 1 0 19.73 14h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-3.5l4 4v-11l-4 4z"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></symbol>
+  <symbol id="i-sticker" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10S22 17.52 22 12 17.52 2 11.99 2zM12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></symbol>
+  <symbol id="i-quote" viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><path d="M11 17h2v-6h-2v6zm1-15C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zM11 9h2V7h-2v2z"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></symbol>
+</svg>
+
+<div class="app" id="app">
+  <aside class="sidebar" id="sidebar" aria-label="Список чатов">
+    <div class="sidebar-head">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true"><svg><use href="#i-plane"/></svg></div>
+        <div class="brand-text">
+          <h1 class="brand-title">Чаты</h1>
+          <div class="conn" id="conn" title="Состояние соединения">
+            <span class="conn-dot" id="connDot"></span>
+            <span class="conn-text" id="connText">подключение…</span>
+          </div>
+        </div>
+        <div class="brand-actions">
+          <button class="icon-btn brand-btn" id="btnFindUser" type="button" title="Люди, писавшие боту" aria-label="Люди, писавшие боту">
+            <svg><use href="#i-user-plus"/></svg>
+          </button>
+          <button class="icon-btn brand-btn" id="btnSettings" type="button" title="Настройки" aria-label="Настройки">
+            <svg><use href="#i-gear"/></svg>
+          </button>
+        </div>
+        <button class="icon-btn sidebar-close" id="btnSidebarClose" type="button" aria-label="Закрыть список чатов">
+          <svg><use href="#i-close"/></svg>
+        </button>
+      </div>
+      <div class="search-box">
+        <svg class="search-ico" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="chatSearch" type="text" placeholder="Поиск по чатам" autocomplete="off" spellcheck="false" aria-label="Поиск по чатам">
+        <button class="search-clear" id="btnSearchClear" type="button" aria-label="Очистить поиск" hidden>
+          <svg><use href="#i-close"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-list" id="chatList"></div>
+    <div class="chat-list-empty" id="chatListEmpty" hidden>
+      <div class="cle-icon"><svg><use href="#i-users"/></svg></div>
+      <div class="cle-title" id="chatListEmptyTitle">Пока нет чатов</div>
+      <div class="cle-text" id="chatListEmptyText">Начните чат: напишите боту /start в Telegram.</div>
+    </div>
+  </aside>
+
+  <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
+
+  <main class="chat" id="chatPanel">
+    <header class="chat-head" id="chatHead">
+      <button class="icon-btn burger" id="btnBurger" type="button" aria-label="Открыть список чатов">
+        <svg><use href="#i-menu"/></svg>
+      </button>
+      <div class="peer">
+        <div class="avatar avatar-head" id="peerAvatar"></div>
+        <div class="peer-text">
+          <div class="peer-name" id="peerName">Выберите чат</div>
+          <div class="peer-sub" id="peerSub">telegram_chats_bot</div>
+        </div>
+      </div>
+      <div class="chat-head-actions">
+        <button class="icon-btn mobile-only" id="btnSettingsMobile" type="button" aria-label="Настройки">
+          <svg><use href="#i-gear"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="messages-wrap" id="messagesWrap">
+      <div class="messages" id="messages" tabindex="-1" aria-live="polite">
+        <div class="load-older-wrap" id="loadOlderWrap" hidden>
+          <button class="load-older" id="loadOlder" type="button">
+            <span class="spinner tiny" id="loadOlderSpin" hidden></span>
+            <span id="loadOlderLabel">Загрузить раньше</span>
+          </button>
+        </div>
+        <div class="feed" id="feed"></div>
+      </div>
+
+      <button class="scroll-down" id="scrollDown" type="button" hidden aria-label="Показать новые сообщения">
+        <svg><use href="#i-arrow-down"/></svg>
+        <span class="badge" id="scrollBadge" hidden>0</span>
+      </button>
+
+      <div class="overlay" id="noChat" hidden>
+        <div class="empty-card">
+          <div class="empty-logo"><svg><use href="#i-plane"/></svg></div>
+          <h2 id="noChatTitle">Начните чат</h2>
+          <p id="noChatText">Напишите боту /start в Telegram — после этого переписка появится здесь.</p>
+          <div class="empty-actions">
+            <button class="btn primary" id="btnNoChatFind" type="button">
+              <svg><use href="#i-user-plus"/></svg><span>Найти пользователя</span>
+            </button>
+            <button class="btn ghost" id="btnNoChatSettings" type="button">
+              <svg><use href="#i-gear"/></svg><span>Настройки</span>
+            </button>
+          </div>
+          <div class="empty-app">telegram_chats_bot</div>
+        </div>
+      </div>
+
+      <div class="overlay" id="chatEmpty" hidden>
+        <div class="empty-card compact">
+          <div class="empty-logo small"><svg><use href="#i-plane"/></svg></div>
+          <h2>Начните чат</h2>
+          <p id="chatEmptyText">Напишите боту /start в Telegram — после этого переписка появится здесь.</p>
+          <div class="empty-actions">
+            <button class="btn ghost small" id="btnChatEmptyFind" type="button">Люди, писавшие боту</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="overlay loading-overlay" id="messagesLoading" hidden>
+        <span class="spinner"></span>
+        <span>Загрузка сообщений…</span>
+      </div>
+    </div>
+
+    <footer class="composer" id="composerEl">
+      <div class="attach-bar" id="attachBar" hidden></div>
+      <div class="fmt-bar" role="toolbar" aria-label="Форматирование сообщения">
+        <button class="fmt-btn" type="button" data-fmt="**" title="Жирный (Ctrl+B)" aria-label="Жирный"><span class="fmt-b">B</span></button>
+        <button class="fmt-btn" type="button" data-fmt="*" title="Курсив (Ctrl+I)" aria-label="Курсив"><span class="fmt-i">I</span></button>
+        <button class="fmt-btn" type="button" data-fmt="~~" title="Зачёркнутый" aria-label="Зачёркнутый"><span class="fmt-s">S</span></button>
+        <button class="fmt-btn" type="button" data-fmt="`" title="Код" aria-label="Код"><span class="fmt-code">&lt;/&gt;</span></button>
+        <button class="fmt-btn" type="button" data-fmt="> " title="Цитата" aria-label="Цитата"><svg><use href="#i-quote"/></svg></button>
+        <button class="fmt-btn" type="button" data-fmt="[текст](url)" title="Ссылка" aria-label="Ссылка"><svg><use href="#i-link"/></svg></button>
+        <span class="fmt-sep" aria-hidden="true"></span>
+        <span class="fmt-hint">Markdown поддерживается</span>
+      </div>
+      <div class="composer-box">
+        <button class="icon-btn attach" id="btnAttach" type="button" title="Прикрепить файл" aria-label="Прикрепить файл">
+          <svg><use href="#i-attach"/></svg>
+        </button>
+        <textarea id="composerInput" rows="1" placeholder="Написать сообщение…" spellcheck="false" aria-label="Сообщение"></textarea>
+        <button class="send-btn" id="btnSend" type="button" title="Отправить (Enter)" aria-label="Отправить" disabled>
+          <svg><use href="#i-plane"/></svg>
+        </button>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<div class="modal" id="modalSettings" hidden>
+  <div class="modal-veil" data-close-modal></div>
+  <div class="modal-card settings-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" tabindex="-1">
+    <header class="modal-head">
+      <div class="modal-head-text">
+        <h2 id="settingsTitle">Настройки</h2>
+        <p class="modal-sub">telegram_chats_bot</p>
+      </div>
+      <button class="icon-btn" type="button" data-close-modal aria-label="Закрыть настройки">
+        <svg><use href="#i-close"/></svg>
+      </button>
+    </header>
+
+    <div class="settings-layout">
+      <nav class="settings-tabs" role="tablist" aria-label="Разделы настроек">
+        <button class="settings-tab active" type="button" role="tab" aria-selected="true" data-tab="theme">
+          <svg><use href="#i-sun"/></svg><span>Тема</span>
+        </button>
+        <button class="settings-tab" type="button" role="tab" aria-selected="false" data-tab="asr">
+          <svg><use href="#i-mic"/></svg><span>Расшифровка</span>
+        </button>
+        <button class="settings-tab" type="button" role="tab" aria-selected="false" data-tab="users">
+          <svg><use href="#i-users"/></svg><span>Пользователи</span>
+        </button>
+        <button class="settings-tab" type="button" role="tab" aria-selected="false" data-tab="about">
+          <svg><use href="#i-info"/></svg><span>О приложении</span>
+        </button>
+      </nav>
+
+      <div class="settings-panes">
+        <section class="settings-pane active" data-pane="theme" role="tabpanel" aria-label="Тема">
+          <div class="pane-head">
+            <h3>Тема оформления</h3>
+            <p class="muted">Выберите, как выглядит интерфейс. Тема сохраняется на сервере.</p>
+          </div>
+          <div class="theme-choice">
+            <button class="theme-card" id="themeDark" type="button" data-theme-opt="dark">
+              <span class="theme-preview tp-dark" aria-hidden="true">
+                <span class="tp-side"></span>
+                <span class="tp-main">
+                  <span class="tp-head"></span>
+                  <span class="tp-bubble tp-in"></span>
+                  <span class="tp-bubble tp-out"></span>
+                  <span class="tp-bubble tp-in tp-short"></span>
+                </span>
+              </span>
+              <span class="theme-card-foot">
+                <span class="theme-card-text"><span class="theme-card-name">Тёмная</span><span class="theme-card-sub">Как в Telegram</span></span>
+                <span class="theme-check"><svg><use href="#i-check"/></svg></span>
+              </span>
+            </button>
+            <button class="theme-card" id="themeLight" type="button" data-theme-opt="light">
+              <span class="theme-preview tp-light" aria-hidden="true">
+                <span class="tp-side"></span>
+                <span class="tp-main">
+                  <span class="tp-head"></span>
+                  <span class="tp-bubble tp-in"></span>
+                  <span class="tp-bubble tp-out"></span>
+                  <span class="tp-bubble tp-in tp-short"></span>
+                </span>
+              </span>
+              <span class="theme-card-foot">
+                <span class="theme-card-text"><span class="theme-card-name">Светлая</span><span class="theme-card-sub">Бело-голубая</span></span>
+                <span class="theme-check"><svg><use href="#i-check"/></svg></span>
+              </span>
+            </button>
+          </div>
+          <p class="hint">Тему можно менять в любой момент — интерфейс переключится сразу.</p>
+        </section>
+
+        <section class="settings-pane" data-pane="asr" role="tabpanel" aria-label="Расшифровка">
+          <div class="pane-head">
+            <h3>Расшифровка речи</h3>
+            <p class="muted">Локальное распознавание голосовых и аудиосообщений.</p>
+          </div>
+
+          <label class="switch-row">
+            <span class="switch-text">
+              <span class="switch-title">Расшифровка речи</span>
+              <span class="switch-sub">Показывать расшифровку голосовых и аудио в чате</span>
+            </span>
+            <input type="checkbox" class="switch-input" id="asrEnabled">
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+
+          <div class="asr-config" id="asrConfig" hidden>
+            <label class="switch-row">
+              <span class="switch-text">
+                <span class="switch-title">Автоматическая расшифровка</span>
+                <span class="switch-sub">Расшифровывать входящие голосовые сразу после получения</span>
+              </span>
+              <input type="checkbox" class="switch-input" id="autoTranscribe">
+              <span class="switch" aria-hidden="true"></span>
+            </label>
+
+            <div class="field">
+              <label class="field-label" for="asrModel">Модель распознавания</label>
+              <select id="asrModel" class="input"></select>
+              <div class="asr-line">
+                <div class="asr-status" id="asrStatus">Загрузка списка моделей…</div>
+                <button class="btn ghost small" id="btnAsrRefresh" type="button" title="Обновить список и статус">
+                  <svg><use href="#i-refresh"/></svg><span>Обновить</span>
+                </button>
+              </div>
+              <div class="progress" id="asrProgress" hidden><i id="asrProgressBar"></i></div>
+              <div class="btn-row">
+                <button class="btn primary" id="btnAsrDownload" type="button">
+                  <svg><use href="#i-download"/></svg><span>Скачать</span>
+                </button>
+              </div>
+            </div>
+
+            <p class="hint">Модели скачиваются один раз и работают локально. Размер и язык указаны в списке.</p>
+          </div>
+
+          <p class="hint" id="asrOffHint" hidden>Расшифровка выключена — кнопки, панели и статусы расшифровки не показываются в чате.</p>
+        </section>
+
+        <section class="settings-pane" data-pane="users" role="tabpanel" aria-label="Пользователи">
+          <div class="pane-head">
+            <h3>Пользователи</h3>
+            <p class="muted">Люди, которые писали боту и добавлены в этот интерфейс.</p>
+          </div>
+
+          <label class="switch-row">
+            <span class="switch-text">
+              <span class="switch-title">Автоподтверждение новых пользователей</span>
+              <span class="switch-sub">Если включено, пользователь, написавший /start, автоматически добавляется в чаты</span>
+            </span>
+            <input type="checkbox" class="switch-input" id="autoApprove">
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+
+          <div class="settings-users" id="settingsUsers"></div>
+
+          <div class="field">
+            <label class="field-label" for="addUserInput">Добавить пользователя</label>
+            <div class="add-user-row">
+              <input class="input" id="addUserInput" type="text" placeholder="ID или @username" autocomplete="off" spellcheck="false">
+              <button class="btn primary" id="btnAddUser" type="button">
+                <svg><use href="#i-user-plus"/></svg><span>Добавить</span>
+              </button>
+            </div>
+            <p class="hint">Можно указать числовой ID или @username.</p>
+          </div>
+        </section>
+
+        <section class="settings-pane" data-pane="about" role="tabpanel" aria-label="О приложении">
+          <div class="pane-head">
+            <h3>О приложении</h3>
+            <p class="muted">Веб-интерфейс для Telegram-чата через Bot API.</p>
+          </div>
+
+          <div class="about-hero">
+            <div class="about-logo"><svg><use href="#i-plane"/></svg></div>
+            <div>
+              <div class="about-name">telegram_chats_bot</div>
+              <div class="about-sub">Локальный чат-интерфейс</div>
+            </div>
+          </div>
+
+          <dl class="facts">
+            <div class="fact"><dt>Адрес API</dt><dd id="aboutApi">—</dd></div>
+            <div class="fact"><dt>Bot API</dt><dd id="aboutApiMode">—</dd></div>
+            <div class="fact"><dt>Лимит скачивания</dt><dd id="aboutDownload">—</dd></div>
+            <div class="fact"><dt>Лимит загрузки</dt><dd id="aboutUpload">—</dd></div>
+            <div class="fact" id="aboutAsrRow"><dt>Расшифровка</dt><dd id="aboutAsr">—</dd></div>
+            <div class="fact"><dt>Интерфейс</dt><dd>Без внешних CDN и библиотек</dd></div>
+          </dl>
+
+          <p class="hint">Все настройки и данные чатов хранятся на вашем сервере. Интерфейс общается с ним только по JSON API.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modalFind" hidden>
+  <div class="modal-veil" data-close-modal></div>
+  <div class="modal-card find-card" role="dialog" aria-modal="true" aria-labelledby="findTitle" tabindex="-1">
+    <header class="modal-head">
+      <div class="modal-head-text">
+        <h2 id="findTitle">Люди, писавшие боту</h2>
+        <p class="modal-sub">Telegram не даёт ботам искать всех пользователей — здесь только те, кто сам написал /start</p>
+      </div>
+      <button class="icon-btn" type="button" data-close-modal aria-label="Закрыть поиск">
+        <svg><use href="#i-close"/></svg>
+      </button>
+    </header>
+
+    <div class="find-search">
+      <div class="search-box">
+        <svg class="search-ico" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="findSearch" type="text" placeholder="Имя, @username или ID" autocomplete="off" spellcheck="false" aria-label="Поиск пользователей">
+        <button class="search-clear" id="btnFindClear" type="button" aria-label="Очистить поиск" hidden>
+          <svg><use href="#i-close"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="find-list" id="findList"></div>
+    <div class="find-empty" id="findEmpty" hidden>
+      <div class="cle-icon"><svg><use href="#i-users"/></svg></div>
+      <div class="cle-title" id="findEmptyTitle">Никого не нашли</div>
+      <div class="cle-text" id="findEmptyText">Напишите боту /start в Telegram — пользователь появится в этом списке.</div>
+    </div>
+    <div class="modal-foot hint">Добавленные пользователи появятся в списке чатов слева.</div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Просмотр изображения">
+  <button class="lb-close" id="lightboxClose" type="button" aria-label="Закрыть">
+    <svg><use href="#i-close"/></svg>
+  </button>
+  <img id="lightboxImg" alt="Изображение">
+  <a class="lb-download" id="lightboxDownload" href="#" download target="_blank" rel="noopener">
+    <svg><use href="#i-download"/></svg><span>Скачать</span>
+  </a>
+</div>
+
+<div class="dropzone" id="dropzone" aria-hidden="true">
+  <div class="dropzone-inner">
+    <svg><use href="#i-upload"/></svg>
+    <strong>Отпустите файлы</strong>
+    <span>Они прикрепятся к сообщению</span>
+  </div>
+</div>
+
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<input type="file" id="fileInput" multiple hidden>
+
+<script src="md.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

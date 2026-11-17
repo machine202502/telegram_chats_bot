@@ -1,0 +1,28 @@
+# Secrets — only .env.example belongs in the repository
+.env
+.env.*
+!.env.example
+config.json
+docker/telegram-bot-api.env
+
+# Runtime data and downloaded models
+data/
+models/
+media/
+webview/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Logs
+*.log
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
