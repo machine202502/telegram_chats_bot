@@ -239,8 +239,20 @@ def main() -> int:
                     file_types=("Все файлы (*.*)",),
                 )
             except Exception as exc:
-                log.exception("Диалог сохранения")
-                return {"ok": False, "error": str(exc)}
+                # Если нативный диалог недоступен из потока API — сохраняем
+                # в Загрузки, чтобы кнопка «Скачать» всё равно работала.
+                log.exception("Диалог сохранения: %s", exc)
+                downloads = Path.home() / "Downloads"
+                downloads.mkdir(parents=True, exist_ok=True)
+                target = downloads / name
+                if target.exists():
+                    target = downloads / (target.stem + "-" + str(int(time.time())) + target.suffix)
+                try:
+                    urllib.request.urlretrieve(f"{URL}/media/{numeric}?download=1", target)
+                except Exception as download_exc:
+                    log.exception("Скачивание в Загрузки")
+                    return {"ok": False, "error": f"Не удалось скачать файл: {download_exc}"}
+                return {"ok": True, "path": str(target)}
             if not selected:
                 return {"ok": False, "cancelled": True}
             target = selected[0] if isinstance(selected, (list, tuple)) else str(selected)
