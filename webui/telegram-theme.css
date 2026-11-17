@@ -1444,6 +1444,13 @@ body.theme-light .md-pre .tok-fn { color: #1d6fb8; }
   width: 100%;
   height: auto;
   max-width: 100%;
-  max-height: none;
-  object-fit: contain;
+  max-height: 280px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Фиксированная ширина блока фото: картинка заполняет его, а не сжимает. */
+.bubble:has(.photo-media) {
+  width: min(340px, 84vw);
+  max-width: min(340px, 84vw);
 }
