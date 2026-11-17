@@ -2800,6 +2800,66 @@
     });
   }
 
+  /* ------------------------------------------------------- ширина сайдбара */
+  function initSidebarResize() {
+    const handle = $('#sidebarResizer');
+    const app = $('#app');
+    const sidebar = $('#sidebar');
+    if (!handle || !app || !sidebar) return;
+
+    const MIN = 320;
+    const MAX = 560;
+    let saved = 0;
+    try {
+      saved = parseInt(localStorage.getItem('tcb_sidebar_w') || '0', 10) || 0;
+    } catch (_err) { /* ignore */ }
+
+    function applyWidth(width) {
+      const value = Math.max(MIN, Math.min(MAX, Math.round(width)));
+      app.style.setProperty('--sidebar-w', value + 'px');
+      return value;
+    }
+
+    if (saved && window.innerWidth > 900) applyWidth(saved);
+
+    let dragging = false;
+    let startX = 0;
+    let startWidth = 0;
+
+    function finish() {
+      if (!dragging) return;
+      dragging = false;
+      document.body.classList.remove('resizing');
+      const width = Math.round(sidebar.getBoundingClientRect().width);
+      try { localStorage.setItem('tcb_sidebar_w', String(width)); } catch (_err) { /* ignore */ }
+    }
+
+    handle.addEventListener('pointerdown', (event) => {
+      if (window.innerWidth <= 900) return;
+      dragging = true;
+      startX = event.clientX;
+      startWidth = sidebar.getBoundingClientRect().width;
+      document.body.classList.add('resizing');
+      try { handle.setPointerCapture(event.pointerId); } catch (_err) { /* ignore */ }
+      event.preventDefault();
+    });
+    handle.addEventListener('pointermove', (event) => {
+      if (!dragging) return;
+      applyWidth(startWidth + (event.clientX - startX));
+    });
+    handle.addEventListener('pointerup', finish);
+    handle.addEventListener('pointercancel', finish);
+    handle.addEventListener('lostpointercapture', finish);
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth <= 900) {
+        app.style.removeProperty('--sidebar-w');
+      } else if (saved) {
+        applyWidth(saved);
+      }
+    });
+  }
+
   /* -------------------------------------------------------------------- init */
   async function init() {
     let initialTheme = 'dark';
@@ -2819,6 +2879,7 @@
     syncSidebar();
     setConnection('connecting');
     bindEvents();
+    initSidebarResize();
 
     await refreshBootstrap(false);
 

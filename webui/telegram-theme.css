@@ -467,31 +467,11 @@ body.theme-light .messages-wrap {
 
 /* «Хвостик» у последнего сообщения в группе — геометрия из telegram-tt
    (MessageAppendix: 9×18, нижний выступ 1px, путь как в telegram-tt). */
-.row.in.g-last .bubble { border-bottom-left-radius: var(--bubble-tail-radius); }
-.row.out.g-last .bubble { border-bottom-right-radius: var(--bubble-tail-radius); }
+.row.in.g-last .bubble { border-bottom-left-radius: 4px; }
+.row.out.g-last .bubble { border-bottom-right-radius: 4px; }
 
-.row.g-last .bubble::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  /* 10px при маске 9px: 1px заходит под пузырь, чтобы не было шва на скруглении */
-  width: 10px;
-  height: 18px;
-  background-color: currentColor;
-  pointer-events: none;
-}
-.row.in.g-last .bubble::after {
-  left: -9px;
-  color: var(--in);
-  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
-  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M3 17h6V0c-.193 2.84-.876 5.767-2.05 8.782-.904 2.325-2.446 4.485-4.625 6.48A1 1 0 003 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
-}
-.row.out.g-last .bubble::after {
-  right: -9px;
-  color: var(--out);
-  -webkit-mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
-  mask: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='18' viewBox='0 0 9 18'%3E%3Cpath fill='%23000' d='M6 17H0V0c.193 2.84.876 5.767 2.05 8.782.904 2.325 2.446 4.485 4.625 6.48A1 1 0 016 17z'/%3E%3C/svg%3E") no-repeat center / 100% 100%;
-}
+/* Хвостик-выступ убран: он давал некрасивый шов на скруглении. */
+.row.g-last .bubble::after { display: none; }
 
 /* Медиа-пузыри: ровные поля, хвостик не мешает */
 .bubble.media-only { padding: 4px; }
@@ -805,9 +785,10 @@ body.theme-light .row.out .wave i.on { background: #3f9d4b; }
 }
 
 #composerInput {
-  min-height: 28px;
+  min-height: 40px;
   max-height: 160px;
-  padding: 8px 2px;
+  padding: 9px 2px;
+  overflow-y: auto;
   font-size: 15px;
   line-height: 1.35;
   color: var(--text-2);
@@ -952,7 +933,11 @@ body.theme-light .row.out .wave i.on { background: #3f9d4b; }
 .modal-foot { padding: 10px 16px 14px; border-top: 1px solid var(--line); }
 
 /* --------------------------------------------------- 19. НАСТРОЙКИ (модалка) */
-.settings-card { width: min(860px, 100%); }
+.settings-card {
+  width: min(900px, 100%);
+  height: min(760px, 92dvh);
+  max-height: 92dvh;
+}
 
 .settings-layout { background: var(--panel); }
 
@@ -1244,7 +1229,7 @@ select.input {
   }
   .settings-tab { flex: 0 0 auto; padding: 8px 11px; }
   .settings-panes { padding: 14px 16px 20px; }
-  .settings-card { max-height: min(92dvh, 900px); }
+  .settings-card { height: 94dvh; max-height: 94dvh; }
   .modal { padding: 14px; }
 }
 
@@ -1286,4 +1271,59 @@ select.input {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ---------------------------------------------------------------------------
+   Логотип приложения: выбранная иконка H вместо старого SVG-самолётика.
+   --------------------------------------------------------------------------- */
+.brand-logo,
+.about-logo {
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+.brand-logo { border-radius: 11px; }
+.about-logo { border-radius: 13px; }
+.brand-logo img,
+.about-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* Перетаскиваемая граница между списком чатов и чатом. */
+.sidebar-resizer {
+  flex: 0 0 5px;
+  width: 5px;
+  margin-left: -3px;
+  cursor: col-resize;
+  position: relative;
+  z-index: 30;
+  background: transparent;
+}
+.sidebar-resizer:hover,
+body.resizing .sidebar-resizer {
+  background: var(--accent-soft);
+}
+body.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+@media (max-width: 900px) {
+  .sidebar-resizer { display: none; }
+}
+
+/* Иконка приложения в пустых состояниях. */
+.empty-logo {
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+  border-radius: 14px;
+}
+.empty-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }

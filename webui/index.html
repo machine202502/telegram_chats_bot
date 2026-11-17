@@ -61,7 +61,7 @@
   <aside class="sidebar" id="sidebar" aria-label="Список чатов">
     <div class="sidebar-head">
       <div class="brand">
-        <div class="brand-logo" aria-hidden="true"><svg><use href="#i-plane"/></svg></div>
+        <div class="brand-logo" aria-hidden="true"><img src="/static/icon.png" alt=""></div>
         <div class="brand-text">
           <h1 class="brand-title">Чаты</h1>
           <div class="conn" id="conn" title="Состояние соединения">
@@ -97,6 +97,8 @@
       <div class="cle-text" id="chatListEmptyText">Начните чат: напишите боту /start в Telegram.</div>
     </div>
   </aside>
+
+  <div class="sidebar-resizer" id="sidebarResizer" role="separator" aria-orientation="vertical" aria-label="Изменить ширину списка чатов"></div>
 
   <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
 
@@ -137,7 +139,7 @@
 
       <div class="overlay" id="noChat" hidden>
         <div class="empty-card">
-          <div class="empty-logo"><svg><use href="#i-plane"/></svg></div>
+          <div class="empty-logo"><img src="/static/icon.png" alt=""></div>
           <h2 id="noChatTitle">Начните чат</h2>
           <p id="noChatText">Напишите боту /start в Telegram — после этого переписка появится здесь.</p>
           <div class="empty-actions">
@@ -154,7 +156,7 @@
 
       <div class="overlay" id="chatEmpty" hidden>
         <div class="empty-card compact">
-          <div class="empty-logo small"><svg><use href="#i-plane"/></svg></div>
+          <div class="empty-logo small"><img src="/static/icon.png" alt=""></div>
           <h2>Начните чат</h2>
           <p id="chatEmptyText">Напишите боту /start в Telegram — после этого переписка появится здесь.</p>
           <div class="empty-actions">
@@ -217,7 +219,6 @@
         <section class="settings-pane active" data-pane="theme" role="tabpanel" aria-label="Тема">
           <div class="pane-head">
             <h3>Тема оформления</h3>
-            <p class="muted">Выберите, как выглядит интерфейс. Тема сохраняется на сервере.</p>
           </div>
           <div class="theme-choice">
             <button class="theme-card" id="themeDark" type="button" data-theme-opt="dark">
@@ -251,19 +252,16 @@
               </span>
             </button>
           </div>
-          <p class="hint">Тему можно менять в любой момент — интерфейс переключится сразу.</p>
         </section>
 
         <section class="settings-pane" data-pane="asr" role="tabpanel" aria-label="Расшифровка">
           <div class="pane-head">
             <h3>Расшифровка речи</h3>
-            <p class="muted">Локальное распознавание голосовых и аудиосообщений.</p>
           </div>
 
           <label class="switch-row">
             <span class="switch-text">
               <span class="switch-title">Расшифровка речи</span>
-              <span class="switch-sub">Показывать расшифровку голосовых и аудио в чате</span>
             </span>
             <input type="checkbox" class="switch-input" id="asrEnabled">
             <span class="switch" aria-hidden="true"></span>
@@ -273,7 +271,6 @@
             <label class="switch-row">
               <span class="switch-text">
                 <span class="switch-title">Автоматическая расшифровка</span>
-                <span class="switch-sub">Расшифровывать входящие голосовые сразу после получения</span>
               </span>
               <input type="checkbox" class="switch-input" id="autoTranscribe">
               <span class="switch" aria-hidden="true"></span>
@@ -295,23 +292,17 @@
                 </button>
               </div>
             </div>
-
-            <p class="hint">Модели скачиваются один раз и работают локально. Размер и язык указаны в списке.</p>
           </div>
-
-          <p class="hint" id="asrOffHint" hidden>Расшифровка выключена — кнопки, панели и статусы расшифровки не показываются в чате.</p>
         </section>
 
         <section class="settings-pane" data-pane="users" role="tabpanel" aria-label="Пользователи">
           <div class="pane-head">
             <h3>Пользователи</h3>
-            <p class="muted">Люди, которые писали боту и добавлены в этот интерфейс.</p>
           </div>
 
           <label class="switch-row">
             <span class="switch-text">
               <span class="switch-title">Автоподтверждение новых пользователей</span>
-              <span class="switch-sub">Если включено, пользователь, написавший /start, автоматически добавляется в чаты</span>
             </span>
             <input type="checkbox" class="switch-input" id="autoApprove">
             <span class="switch" aria-hidden="true"></span>
@@ -327,18 +318,16 @@
                 <svg><use href="#i-user-plus"/></svg><span>Добавить</span>
               </button>
             </div>
-            <p class="hint">Можно указать числовой ID или @username.</p>
           </div>
         </section>
 
         <section class="settings-pane" data-pane="about" role="tabpanel" aria-label="О приложении">
           <div class="pane-head">
             <h3>О приложении</h3>
-            <p class="muted">Веб-интерфейс для Telegram-чата через Bot API.</p>
           </div>
 
           <div class="about-hero">
-            <div class="about-logo"><svg><use href="#i-plane"/></svg></div>
+            <div class="about-logo"><img src="/static/icon.png" alt=""></div>
             <div>
               <div class="about-name">telegram_chats_bot</div>
               <div class="about-sub">Локальный чат-интерфейс</div>
@@ -353,8 +342,6 @@
             <div class="fact" id="aboutAsrRow"><dt>Расшифровка</dt><dd id="aboutAsr">—</dd></div>
             <div class="fact"><dt>Интерфейс</dt><dd>Без внешних CDN и библиотек</dd></div>
           </dl>
-
-          <p class="hint">Все настройки и данные чатов хранятся на вашем сервере. Интерфейс общается с ним только по JSON API.</p>
         </section>
       </div>
     </div>
@@ -367,7 +354,6 @@
     <header class="modal-head">
       <div class="modal-head-text">
         <h2 id="findTitle">Люди, писавшие боту</h2>
-        <p class="modal-sub">Telegram не даёт ботам искать всех пользователей — здесь только те, кто сам написал /start</p>
       </div>
       <button class="icon-btn" type="button" data-close-modal aria-label="Закрыть поиск">
         <svg><use href="#i-close"/></svg>
@@ -390,7 +376,6 @@
       <div class="cle-title" id="findEmptyTitle">Никого не нашли</div>
       <div class="cle-text" id="findEmptyText">Напишите боту /start в Telegram — пользователь появится в этом списке.</div>
     </div>
-    <div class="modal-foot hint">Добавленные пользователи появятся в списке чатов слева.</div>
   </div>
 </div>
 
