@@ -1327,3 +1327,20 @@ body.resizing {
   display: block;
   object-fit: cover;
 }
+
+.sidebar-resizer::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+  opacity: 0.55;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
+}
+.sidebar-resizer:hover::after,
+body.resizing .sidebar-resizer::after {
+  background: var(--accent);
+  opacity: 1;
+}
