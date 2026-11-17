@@ -1586,3 +1586,42 @@ body.theme-light .md-pre .tok-fn { color: #1d6fb8; }
 }
 
 .bubble:has(.link-preview) { max-width: min(480px, 82%); }
+
+/* Ожидающие подтверждения — свёрнутый список в настройках. */
+.pending-block {
+  margin: 12px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--file-bg);
+  overflow: hidden;
+}
+.pending-block > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  user-select: none;
+}
+.pending-block > summary::-webkit-details-marker { display: none; }
+.pending-block > summary::before {
+  content: "▸";
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+.pending-block[open] > summary::before { transform: rotate(90deg); }
+.pending-count {
+  margin-left: auto;
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11.5px;
+  text-align: center;
+}
+.pending-block .settings-users { padding: 0 8px 8px; }

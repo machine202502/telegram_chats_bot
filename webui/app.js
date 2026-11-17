@@ -58,6 +58,8 @@
     transcribing: new Set(),
     chatsSignature: '',
     usersSignature: '',
+    pendingUsers: [],
+    pendingSignature: '',
     chatSearch: '',
     olderCooldownUntil: 0,
     asrModels: [],
@@ -143,6 +145,9 @@
     btnAsrDownload: $('#btnAsrDownload'),
     btnAsrRefresh: $('#btnAsrRefresh'),
     settingsUsers: $('#settingsUsers'),
+    pendingBlock: $('#pendingBlock'),
+    pendingUsers: $('#pendingUsers'),
+    pendingCount: $('#pendingCount'),
     addUserInput: $('#addUserInput'),
     btnAddUser: $('#btnAddUser'),
     autoApprove: $('#autoApprove'),
@@ -644,6 +649,69 @@
         '</div>' +
       '</div>';
     }).join('');
+  }
+
+  function renderPendingUsers(force) {
+    if (!ui.pendingBlock || !ui.pendingUsers) return;
+    const signature = state.pendingUsers.map((user) => [
+      user.id, user.name, user.username, user.avatar_url
+    ].join('\u0001')).join('\u0002');
+    if (!force && signature === state.pendingSignature) return;
+    state.pendingSignature = signature;
+    ui.pendingBlock.hidden = state.pendingUsers.length === 0;
+    if (ui.pendingCount) ui.pendingCount.textContent = String(state.pendingUsers.length);
+    if (!state.pendingUsers.length) {
+      ui.pendingUsers.innerHTML = '';
+      return;
+    }
+    ui.pendingUsers.innerHTML = state.pendingUsers.map((user) => {
+      const name = user.name || user.username || ('Пользователь ' + user.id);
+      const bits = [];
+      if (user.username) bits.push('@' + user.username);
+      bits.push('ID ' + user.id);
+      return '<div class="user-row pending-row" data-pending-user="' + esc(user.id) + '">' +
+        avatarHtml(user.avatar_url, name, user.id, 'avatar-sm') +
+        '<div class="user-main">' +
+          '<div class="user-name">' + esc(name) + '</div>' +
+          '<div class="user-sub">' + esc(bits.join(' · ')) + '</div>' +
+        '</div>' +
+        '<div class="user-actions">' +
+          '<button class="btn primary small" type="button" data-add-pending="' + esc(user.id) + '">' +
+            '<svg><use href="#i-user-plus"/></svg><span>Добавить</span></button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  async function loadPendingUsers(force) {
+    if (!ui.pendingBlock) return;
+    try {
+      const data = await api('/api/known_users');
+      state.pendingUsers = (Array.isArray(data.users) ? data.users : []).filter((user) => !user.allowed);
+      renderPendingUsers(!!force);
+    } catch (_err) {
+      /* тихо: список появится при следующем открытии */
+    }
+  }
+
+  async function addPendingUser(userId, button) {
+    if (!userId || !button) return;
+    button.disabled = true;
+    try {
+      const data = await api('/api/chats/add', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: Number(userId) }),
+      });
+      if (data.chat) upsertChat(data.chat);
+      state.pendingUsers = state.pendingUsers.filter((user) => Number(user.id) !== Number(userId));
+      renderPendingUsers(true);
+      toast('Пользователь добавлен', 'success');
+      refreshChatsSoon();
+    } catch (err) {
+      toast('Не удалось добавить пользователя: ' + err.message, 'error');
+    } finally {
+      button.disabled = false;
+    }
   }
 
   function setChats(chats) {
@@ -2494,6 +2562,9 @@
     if (name === 'asr' && state.settings.asr_enabled && !state.asrModels.length) {
       loadAsrModels(false);
     }
+    if (name === 'users') {
+      loadPendingUsers(true);
+    }
   }
 
   function openSettings(tab) {
@@ -3096,6 +3167,14 @@
       ui.btnAsrRefresh.addEventListener('click', () => loadAsrModels(false));
     }
     if (ui.btnAddUser) ui.btnAddUser.addEventListener('click', submitAddUser);
+    if (ui.pendingUsers) {
+      ui.pendingUsers.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-add-pending]');
+        if (!button) return;
+        event.preventDefault();
+        addPendingUser(button.dataset.addPending, button);
+      });
+    }
     if (ui.addUserInput) {
       ui.addUserInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
