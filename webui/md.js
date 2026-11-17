@@ -181,10 +181,14 @@
     const flushDetails = () => {
       if (!details || !details.length) { details = null; return; }
       out.push(
-        '<details class="md-details">' +
-          '<summary class="md-details-summary">Показать полностью</summary>' +
-          '<div class="md-quote md-details-body">' + details.map(inline).join('<br>') + '</div>' +
-        '</details>'
+        '<blockquote class="md-quote md-quote-expandable">' +
+          '<div class="md-quote-clip">' + details.map(inline).join('<br>') + '</div>' +
+          '<button class="md-quote-toggle" type="button" aria-expanded="false" title="Развернуть">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+              'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+              '<path d="M6 9l6 6 6-6"></path></svg>' +
+          '</button>' +
+        '</blockquote>'
       );
       details = null;
     };

@@ -322,6 +322,20 @@
     return esc(text).replace(/\n/g, '<br>');
   }
 
+  function initExpandableQuotes(root) {
+    if (!root) return;
+    root.querySelectorAll('.md-quote-expandable').forEach((quote) => {
+      const clip = quote.querySelector('.md-quote-clip');
+      const toggle = quote.querySelector('.md-quote-toggle');
+      if (!clip || !toggle) return;
+      quote.classList.remove('is-open');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.title = 'Развернуть';
+      const overflowing = clip.scrollHeight - clip.clientHeight > 2;
+      quote.classList.toggle('is-short', !overflowing);
+    });
+  }
+
   function toast(text, type) {
     if (!ui.toasts) return;
     const kind = type || 'info';
@@ -1504,6 +1518,7 @@
       ui.feed.appendChild(buildRow(msg));
     });
     initAudioPlayers(ui.feed);
+    initExpandableQuotes(ui.feed);
     refreshGrouping();
     applySelectionState();
     autoEnsureMedia();
@@ -1533,6 +1548,7 @@
     const row = buildRow(msg);
     ui.feed.appendChild(row);
     initAudioPlayers(row);
+    initExpandableQuotes(row);
     refreshGrouping();
     applySelectionState();
     autoEnsureMedia();
@@ -1547,6 +1563,7 @@
     const replacement = buildRow(msg);
     row.replaceWith(replacement);
     initAudioPlayers(replacement);
+    initExpandableQuotes(replacement);
     refreshGrouping();
     if (state.stick) {
       requestAnimationFrame(() => {
@@ -1711,6 +1728,7 @@
 
       ui.feed.insertBefore(fragment, ui.feed.firstChild);
       initAudioPlayers(ui.feed);
+      initExpandableQuotes(ui.feed);
       refreshGrouping();
       setScrollTop(prevTop + (ui.messages.scrollHeight - prevHeight));
       state.olderCooldownUntil = Date.now() + 600;
@@ -2884,6 +2902,17 @@
       const spoiler = target.closest('.spoiler');
       if (spoiler) {
         spoiler.classList.toggle('open');
+        return;
+      }
+
+      const expandToggle = target.closest('.md-quote-toggle');
+      if (expandToggle) {
+        const quote = expandToggle.closest('.md-quote-expandable');
+        if (quote) {
+          const open = quote.classList.toggle('is-open');
+          expandToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+          expandToggle.title = open ? 'Свернуть' : 'Развернуть';
+        }
         return;
       }
 
