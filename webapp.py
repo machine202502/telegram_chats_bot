@@ -482,14 +482,23 @@ class WebApp:
     # ------------------------------------------------------------------ медиа
     def ensure_media(self, msg_id: int) -> bool:
         row = self.store.get_raw(msg_id)
-        if row is None or row["local_path"] or not row["media"]:
-            return bool(row and row["local_path"])
+        if row is None:
+            return False
+        if row["local_path"] and Path(row["local_path"]).is_file():
+            return True
+        if row["local_path"]:
+            # Путь остался от старой версии/удалённого файла — сбрасываем его,
+            # чтобы UI не показывал вечно сломанную картинку.
+            self.store.patch(msg_id, int(row["chat_id"]), local_path=None, error=None)
+        if not row["media"]:
+            return False
         try:
             media = json.loads(row["media"])
         except (TypeError, ValueError):
             return False
         file_id = media.get("file_id")
         if not file_id:
+            self.store.patch(msg_id, int(row["chat_id"]), error="Файл потерян (нет file_id)")
             return False
         self._downloads.put({
             "msg_id": int(msg_id),
@@ -532,11 +541,17 @@ class WebApp:
         msg_id = int(job["msg_id"])
         chat_id = int(job.get("chat_id") or 0)
         row = self.store.get_raw(msg_id)
-        if row is None or row["local_path"]:
+        if row is None:
             return
+        if row["local_path"] and Path(row["local_path"]).is_file():
+            return
+        if row["local_path"]:
+            self.store.patch(msg_id, chat_id, local_path=None)
+        log.info("Скачивание вложения %s (%s, %s байт)", msg_id, job.get("kind"), job.get("size"))
         try:
             info = self.tg.get_file(job["file_id"])
         except TelegramError as exc:
+            log.warning("getFile %s: %s", msg_id, exc.human())
             self.store.patch(msg_id, chat_id, error=exc.human())
             return
         path = info.get("file_path") or ""
@@ -555,12 +570,13 @@ class WebApp:
         try:
             self.tg.download(path, dest, limit=self.download_limit)
         except (TelegramError, OSError) as exc:
+            log.warning("download %s: %s", msg_id, exc)
             self.store.patch(msg_id, chat_id, error=str(exc))
             return
 
-        if job.get("kind") == "voice" or ext in {".ogg", ".oga", ".opus"}:
+        if job.get("kind") == "voice" and ext not in {".mp3"}:
             converted = audio.convert_to_mp3(dest)
-            if converted is not None:
+            if converted is not None and converted != dest:
                 try:
                     dest.unlink(missing_ok=True)
                 except OSError:
@@ -572,6 +588,7 @@ class WebApp:
                 self.store.patch(msg_id, chat_id, media=media)
 
         self.store.patch(msg_id, chat_id, local_path=str(dest), error=None)
+        log.info("Вложение %s сохранено: %s", msg_id, dest.name)
         self.store.update_chat_last(chat_id, int(row["date"]),
                                     KIND_LABELS.get(row["kind"], "Вложение"))
         updated = self.store.get_raw(msg_id)

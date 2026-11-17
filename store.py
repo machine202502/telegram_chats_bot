@@ -538,7 +538,7 @@ class Store:
             "transcript": row["transcript"] or "",
             "transcript_state": row["transcript_state"] or "",
             "transcript_error": row["transcript_error"] or "",
-            "local": row["local_path"] is not None,
+            "local": bool(row["local_path"] and Path(row["local_path"]).is_file()),
             "status": row["status"],
             "error": row["error"],
             "edited": bool(row["edited"]),
