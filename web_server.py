@@ -436,22 +436,86 @@ def _adapt_agent_app(app: WebApp):
         def chat_id(self) -> int:
             return self._source.default_chat_id() or 0
 
+        def _chat(self, chat_id=None) -> int:
+            cid = int(chat_id) if chat_id not in (None, "") else self.chat_id
+            chat = self.store.get_chat(cid) if cid else None
+            if not chat or not chat.get("allowed"):
+                raise agent_api.AgentError(
+                    "Чат не найден или пользователь заблокирован", 404
+                )
+            return cid
+
         def state(self) -> dict[str, Any]:
             data = self._source.state()
             data["agent_api"] = self.agent_info
             return data
 
-        def send_text(self, text: str, plain: bool = False):
-            chat_id = self.chat_id
-            if not chat_id:
-                return [], "Нет ни одного добавленного чата"
-            return self._source.send_text(chat_id, text, plain=plain)
+        def send_text(self, text: str, plain: bool = False, chat_id=None):
+            try:
+                cid = self._chat(chat_id)
+            except agent_api.AgentError as exc:
+                return [], exc.message
+            return self._source.send_text(cid, text, plain=plain)
 
-        def send_file(self, tmp_path: Path, name: str, mime: str, caption: str):
-            chat_id = self.chat_id
-            if not chat_id:
-                return None, "Нет ни одного добавленного чата"
-            return self._source.send_file(chat_id, tmp_path, name, mime, caption)
+        def send_file(self, tmp_path: Path, name: str, mime: str, caption: str,
+                      chat_id=None):
+            try:
+                cid = self._chat(chat_id)
+            except agent_api.AgentError as exc:
+                return None, exc.message
+            return self._source.send_file(cid, tmp_path, name, mime, caption)
+
+        def users(self) -> list[dict[str, Any]]:
+            result: dict[int, dict[str, Any]] = {}
+            for chat in self.store.list_chats(allowed_only=False):
+                result[int(chat["id"])] = {
+                    "id": int(chat["id"]),
+                    "chat_id": int(chat["id"]),
+                    "name": chat.get("name") or str(chat["id"]),
+                    "username": chat.get("username"),
+                    "allowed": bool(chat.get("allowed")),
+                    "last_seen": chat.get("last_date"),
+                }
+            for user in self.store.list_known_users():
+                uid = int(user["id"])
+                item = result.setdefault(uid, {
+                    "id": uid,
+                    "chat_id": uid,
+                    "name": user.get("name") or str(uid),
+                    "username": user.get("username"),
+                    "allowed": False,
+                    "last_seen": user.get("last_seen"),
+                })
+                item["name"] = item.get("name") or user.get("name")
+                item["username"] = item.get("username") or user.get("username")
+                item["last_seen"] = item.get("last_seen") or user.get("last_seen")
+            return sorted(result.values(), key=lambda item: bool(item.get("allowed")), reverse=True)
+
+        def add_user(self, user_id=None, username=None) -> dict[str, Any]:
+            try:
+                return self._source.add_chat(user_id=user_id, username=username)
+            except ValueError as exc:
+                raise agent_api.AgentError(str(exc), 404) from exc
+
+        def block_user(self, chat_id=None) -> dict[str, Any]:
+            cid = self._chat(chat_id)
+            self._source.remove_chat(cid)
+            return self.store.get_chat(cid) or {"id": cid, "allowed": False}
+
+        def unblock_user(self, chat_id=None) -> dict[str, Any]:
+            cid = int(chat_id) if chat_id not in (None, "") else self.chat_id
+            if not cid:
+                raise agent_api.AgentError("Не указан chat_id", 400)
+            self.store.set_chat_allowed(cid, True)
+            return self.store.get_chat(cid) or {"id": cid, "allowed": True}
+
+        def messages(self, chat_id=None, limit: int = 50, since_id: int = 0):
+            cid = self._chat(chat_id) if chat_id else self.chat_id
+            if not cid:
+                return []
+            if since_id:
+                return self.store.after_for_chat(cid, int(since_id), limit=limit)
+            return self.store.recent_for_chat(cid, limit=limit)
 
         def ensure_media(self, msg_id: int) -> bool:
             return self._source.ensure_media(msg_id)

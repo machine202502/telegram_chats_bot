@@ -53,6 +53,32 @@ docker compose logs -f app
 
 Откройте <http://localhost:8000>. Агентский API доступен на <http://localhost:8765>.
 
+## API для внешних агентов
+
+Полная справка: <http://localhost:8765/api/help>. Пути работают с префиксом `/api` и без него.
+Если задан `AGENT_TOKEN`, передавайте `X-Token` или `?token=...`.
+
+| Метод | Путь | Назначение |
+|---|---|---|
+| GET | `/api/users` | список пользователей: `id`, `chat_id`, имя, username, `allowed` |
+| POST | `/api/users/add` | добавить по `{user_id}` или `{username}` |
+| POST | `/api/users/block` | заблокировать: убрать доступ, история сохраняется |
+| POST | `/api/users/unblock` | вернуть доступ |
+| POST | `/api/send` | текст: `{chat_id, text, parse}` |
+| POST | `/api/send_file` | файл: multipart `file` + `chat_id`, либо JSON base64/path/url |
+| GET | `/api/messages?chat_id=...&limit=...&since_id=...` | входящие и исходящие сообщения |
+| GET | `/api/media/<message_id>` | скачать полученный файл |
+| GET | `/api/status` | состояние бота |
+
+Без `chat_id` используется чат по умолчанию. Добавить можно только пользователя,
+который уже писал боту `/start` (ограничение Telegram).
+
+Интеграционный тест API (поднимает реальный HTTP-сервер на свободном порту):
+
+```bash
+python -m unittest tests.test_agent_api -v
+```
+
 При первом запуске создаются `data/` и `models/`; если модель распознавания ещё не скачана,
 в настройках будет кнопка «Скачать».
 
