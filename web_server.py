@@ -300,6 +300,19 @@ def create_flask(app: WebApp) -> Flask:
                 messages.append(message)
         return jsonify({"ok": True, "messages": messages})
 
+    @flask_app.post("/api/ensure_media")
+    def ensure_media():
+        data = request.get_json(silent=True) or {}
+        msg_id = int(data.get("id") or 0)
+        if not msg_id:
+            raise ApiError("Не указан id")
+        row = app.store.get_raw(msg_id)
+        if row is None:
+            raise ApiError("Сообщение не найдено", 404)
+        _require_chat(app, int(row["chat_id"]))
+        ok = app.ensure_media(msg_id)
+        return jsonify({"ok": ok, "queued": bool(ok)})
+
     @flask_app.post("/api/transcribe")
     def transcribe():
         data = request.get_json(silent=True) or {}

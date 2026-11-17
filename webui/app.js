@@ -67,6 +67,7 @@
     selectionMode: false,
     selected: new Set(),
     contextMsg: null,
+    ensuring: new Set(),
     asrTimer: null,
     findUsers: [],
     findLoading: false,
@@ -884,6 +885,25 @@
     return Array.from(state.messages.values()).sort(compareMessages);
   }
 
+  function autoEnsureMedia() {
+    const chatId = state.activeId;
+    if (!chatId) return;
+    sortedMessages().forEach((msg) => {
+      if (msg.local || msg.error || msg.uploading || !msg.media) return;
+      const key = chatId + ':' + msg.id;
+      if (state.ensuring.has(key)) return;
+      state.ensuring.add(key);
+      api('/api/ensure_media', {
+        method: 'POST',
+        body: JSON.stringify({ id: msg.id }),
+      }).catch(() => {
+        /* повторим при следующем рендере */
+      }).finally(() => {
+        setTimeout(() => state.ensuring.delete(key), 12000);
+      });
+    });
+  }
+
   function mediaSrc(msg) {
     const rev = Number(msg.rev) || 0;
     return '/media/' + encodeURIComponent(msg.id) + (rev ? '?v=' + rev : '');
@@ -921,9 +941,8 @@
   }
 
   function missingPlaceholder(msg, text, failed) {
-    const retry = isNumericId(msg.id)
-      ? '<button class="retry-btn" type="button" data-retry-media="' + esc(msg.id) + '">' +
-          (failed ? 'Повторить' : 'Загрузить') + '</button>'
+    const retry = failed && isNumericId(msg.id)
+      ? '<button class="retry-btn" type="button" data-retry-media="' + esc(msg.id) + '">Повторить</button>'
       : '';
     return '<div class="media-placeholder">' +
       (failed ? icon('warning') : '<span class="spinner"></span>') +
@@ -970,7 +989,6 @@
         '<div class="wave">' + bars.join('') + '</div>' +
       '</div>' +
       '<span class="audio-dur">' + fmtDuration(duration) + '</span>' +
-      downloadLink(msg, 'audio-dl', 'Скачать аудио') +
       '<audio preload="metadata" src="' + mediaSrc(msg) + '"></audio>' +
     '</div>';
   }
@@ -981,7 +999,6 @@
       '<img class="photo" src="' + esc(src) + '" data-full="' + esc(src) +
         '" data-download="' + esc(mediaDownloadUrl(msg.id)) + '" alt="' + esc(label || 'Фото') +
         '" loading="lazy">' +
-      downloadLink(msg, 'media-dl', 'Скачать изображение') +
     '</div>';
   }
 
@@ -992,7 +1009,6 @@
       : ' controls playsinline preload="metadata"';
     return '<div class="media video-media">' +
       '<video' + attrs + ' src="' + esc(src) + '"></video>' +
-      downloadLink(msg, 'media-dl', 'Скачать видео') +
     '</div>';
   }
 
@@ -1022,7 +1038,6 @@
     if (kind === 'video_note') {
       return '<div class="media video-note">' +
         '<video controls autoplay loop muted playsinline preload="metadata" src="' + esc(mediaSrc(msg)) + '"></video>' +
-        downloadLink(msg, 'media-dl', 'Скачать видеосообщение') +
       '</div>';
     }
     if (kind === 'animation') {
@@ -1033,7 +1048,6 @@
     if (kind === 'sticker') {
       return '<div class="media sticker">' +
         '<img src="' + esc(mediaSrc(msg)) + '" alt="Стикер" loading="lazy">' +
-        downloadLink(msg, 'media-dl', 'Скачать стикер') +
       '</div>';
     }
     if (kind === 'audio' || kind === 'voice') {
@@ -1047,7 +1061,6 @@
           '<span class="file-name">' + esc(name || 'Файл') + '</span>' +
           '<span class="file-size">' + esc(size || 'файл') + '</span>' +
         '</span>' +
-        downloadLink(msg, 'file-dl', 'Скачать файл') +
       '</div>';
     }
     if (media.is_image) return photoHtml(msg, 'Изображение');
@@ -1314,6 +1327,7 @@
     initAudioPlayers(ui.feed);
     refreshGrouping();
     applySelectionState();
+    autoEnsureMedia();
     updateLoadOlder();
     updateOverlays();
   }
@@ -1342,6 +1356,7 @@
     initAudioPlayers(row);
     refreshGrouping();
     applySelectionState();
+    autoEnsureMedia();
     updateLoadOlder();
     updateOverlays();
     return true;
@@ -2383,13 +2398,6 @@
     if (!src) return;
     ui.lightboxImg.src = src;
     ui.lightboxImg.alt = alt || 'Изображение';
-    if (downloadUrl) {
-      ui.lightboxDownload.href = downloadUrl;
-      ui.lightboxDownload.hidden = false;
-    } else {
-      ui.lightboxDownload.removeAttribute('href');
-      ui.lightboxDownload.hidden = true;
-    }
     ui.lightbox.hidden = false;
     if (ui.lightboxClose) ui.lightboxClose.focus();
   }
@@ -2845,6 +2853,12 @@
     document.addEventListener('click', (event) => {
       if (ui.ctxMenu && !ui.ctxMenu.hidden && !event.target.closest('#ctxMenu')) hideContextMenu();
     });
+    document.addEventListener('pointerdown', (event) => {
+      if (ui.ctxMenu && !ui.ctxMenu.hidden && !event.target.closest('#ctxMenu')) hideContextMenu();
+    }, true);
+    ui.messages.addEventListener('scroll', hideContextMenu, { passive: true });
+    window.addEventListener('wheel', hideContextMenu, { passive: true });
+    window.addEventListener('resize', hideContextMenu);
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
         if (ui.ctxMenu && !ui.ctxMenu.hidden) { hideContextMenu(); return; }
