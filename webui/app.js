@@ -622,8 +622,10 @@
         '</div>' +
         '<div class="user-actions">' +
           '<button class="btn ghost small" type="button" data-remove-chat="' + esc(chat.id) + '"' +
-            (chat.allowed ? '' : ' disabled') + '>Убрать из поддержки</button>' +
-          '<button class="btn danger small" type="button" data-delete-chat="' + esc(chat.id) + '">Удалить чат локально</button>' +
+            ' title="Запретить пользователю писать боту. История сообщений сохранится."' +
+            (chat.allowed ? '' : ' disabled') + '>Убрать доступ</button>' +
+          '<button class="btn danger small" type="button" data-delete-chat="' + esc(chat.id) + '"' +
+            ' title="Удаляет чат только в этом приложении. В Telegram переписка останется.">Удалить чат</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -2142,7 +2144,7 @@
   async function deleteChat(chatId) {
     const chat = getChat(chatId);
     const name = chat ? displayName(chat) : 'этот чат';
-    if (!window.confirm('Удалить чат с «' + name + '» локально? В Telegram переписка останется.')) return;
+    if (!window.confirm('Удалить чат с «' + name + '»? Он исчезнет только из этого приложения, в Telegram переписка останется.')) return;
     try {
       await api('/api/chats/delete', {
         method: 'POST',
@@ -2157,7 +2159,7 @@
       updateChatHeader();
       updateOverlays();
       updateComposer();
-      toast('Чат удалён локально', 'success');
+      toast('Чат удалён из приложения', 'success');
       refreshChatsSoon();
     } catch (err) {
       toast('Не удалось удалить чат: ' + err.message, 'error');
