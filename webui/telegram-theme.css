@@ -1434,3 +1434,16 @@ body.theme-light .md-pre .tok-fn { color: #1d6fb8; }
 }
 .ctx-menu button:hover { background: var(--hover); }
 .ctx-menu button[disabled] { display: none; }
+
+/* Фото занимает всю ширину пузыря, пропорции сохраняются.
+   Иначе вертикальный скриншот сжимался по высоте и оставлял пустоту справа. */
+.bubble .media.photo-media {
+  width: 100%;
+}
+.bubble .media.photo-media img.photo {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  max-height: none;
+  object-fit: contain;
+}

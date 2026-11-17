@@ -45,14 +45,14 @@ def _forward_info(message: dict[str, Any]) -> dict[str, Any] | None:
             ).strip()
             return {
                 "type": "user",
-                "name": name or user.get("username") or "скрытый пользователь",
+                "name": name or user.get("username") or "неизвестный",
                 "username": user.get("username"),
                 "id": user.get("id"),
             }
         if kind == "hidden_user":
             return {
                 "type": "hidden_user",
-                "name": origin.get("sender_user_name") or "скрытый пользователь",
+                "name": origin.get("sender_user_name") or "неизвестный",
             }
         if kind in ("chat", "channel"):
             chat = origin.get("chat") or {}
@@ -72,7 +72,7 @@ def _forward_info(message: dict[str, Any]) -> dict[str, Any] | None:
         ).strip()
         return {
             "type": "user",
-            "name": name or user.get("username") or "скрытый пользователь",
+            "name": name or user.get("username") or "неизвестный",
             "username": user.get("username"),
             "id": user.get("id"),
         }
@@ -87,7 +87,7 @@ def _forward_info(message: dict[str, Any]) -> dict[str, Any] | None:
     if message.get("forward_sender_name"):
         return {"type": "hidden_user", "name": message["forward_sender_name"]}
     if message.get("forward_date"):
-        return {"type": "hidden_user", "name": "скрытый пользователь"}
+        return {"type": "hidden_user", "name": "неизвестный"}
     return None
 
 
@@ -178,3 +178,4 @@ def normalize(message: dict[str, Any]) -> dict[str, Any] | None:
         "error": None,
         "edited": 0,
     }
+

@@ -1916,10 +1916,10 @@ select.input option { background: var(--panel); color: var(--text); }
 }
 .lightbox.anim img,
 .lightbox.anim video {
-  width: 92vw;
+  width: min(68vw, 760px);
   height: auto;
-  max-width: 92vw;
-  max-height: 92vh;
+  max-width: min(68vw, 760px);
+  max-height: 68vh;
   object-fit: contain;
 }
 .lb-close {
@@ -2097,7 +2097,7 @@ body.dragging .dropzone { display: grid; }
   .lightbox { padding: 12px; }
   .lightbox img { max-width: 88vw; max-height: 70vh; }
   .lightbox video { max-width: 88vw; max-height: 70vh; }
-  .lightbox.anim img, .lightbox.anim video { width: 96vw; max-width: 96vw; max-height: 82vh; }
+  .lightbox.anim img, .lightbox.anim video { width: 88vw; max-width: 88vw; max-height: 70vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
