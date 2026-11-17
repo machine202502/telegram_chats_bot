@@ -114,6 +114,36 @@ def extract_js(source: str) -> str:
             out.append(source[i:end + 2])
             i = end + 2
             continue
+        if ch == "/":
+            # Регулярное выражение может содержать кавычки — его нельзя
+            # принимать за строку. Определяем контекст по предыдущему токену.
+            before = source[:i].rstrip()
+            prev = before[-1:] if before else ""
+            word = re.search(r"([A-Za-z_$][\w$]*)$", before)
+            is_regex = prev in "=(:,![&|?{};" or (
+                word is not None and word.group(1) in {
+                    "return", "case", "typeof", "delete", "void", "new",
+                    "in", "of", "yield", "await",
+                }
+            )
+            if is_regex:
+                j = i + 1
+                in_class = False
+                while j < n:
+                    if source[j] == "\\":
+                        j += 2
+                        continue
+                    if source[j] == "[":
+                        in_class = True
+                    elif source[j] == "]":
+                        in_class = False
+                    elif source[j] == "/" and not in_class:
+                        j += 1
+                        break
+                    j += 1
+                out.append(source[i:j])
+                i = j
+                continue
         if ch in ("'", '"'):
             quote = ch
             j = i + 1

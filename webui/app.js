@@ -7,13 +7,13 @@
   const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
 
   const APP_NAME = 'telegram_chats_bot';
-  const MONTHS = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля',
-    'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-  const WEEKDAYS = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+  const MONTHS = [t('auto.68'), t('auto.69'), t('auto.70'), t('auto.71'), t('auto.72'), t('auto.73'), t('auto.74'),
+    t('auto.75'), t('auto.76'), t('auto.77'), t('auto.78'), t('auto.79')];
+  const WEEKDAYS = [t('auto.80'), t('auto.81'), t('auto.82'), t('auto.83'), t('auto.84'), t('auto.85'), t('auto.86')];
   const CONNECTION_TEXT = {
-    online: 'на связи',
-    connecting: 'подключение…',
-    offline: 'нет связи'
+    online: t('auto.87'),
+    connecting: t('auto.5'),
+    offline: t('auto.88')
   };
 
   function defaultSettings() {
@@ -212,8 +212,8 @@
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const that = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const diff = Math.round((today - that) / 86400000);
-    if (diff === 0) return 'Сегодня';
-    if (diff === 1) return 'Вчера';
+    if (diff === 0) return t('auto.89');
+    if (diff === 1) return t('auto.90');
     const year = d.getFullYear() === now.getFullYear() ? '' : ' ' + d.getFullYear();
     return d.getDate() + ' ' + MONTHS[d.getMonth()] + year;
   }
@@ -226,14 +226,14 @@
     const that = new Date(d.getFullYear(), d.getMonth(), d.getDate());
     const diff = Math.round((today - that) / 86400000);
     if (diff === 0) return fmtTime(ts);
-    if (diff === 1) return 'Вчера';
+    if (diff === 1) return t('auto.90');
     if (diff > 1 && diff < 7) return WEEKDAYS[d.getDay()];
     return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + String(d.getFullYear()).slice(2);
   }
 
   function plainPreview(value) {
     let text = String(value == null ? '' : value).replace(/\r\n?/g, '\n');
-    text = text.replace(/```[\s\S]*?```/g, ' [код] ');
+    text = text.replace(/```[\s\S]*?```/g, t('auto.91'));
     text = text.replace(/`([^`\n]+)`/g, '$1');
     text = text.replace(/!\[([^\]]*)\]\([^)\s]*\)/g, '$1');
     text = text.replace(/\[([^\]]+)\]\([^)\s]*\)/g, '$1');
@@ -252,9 +252,9 @@
     const d = new Date(Number(ts) * 1000);
     const now = new Date();
     const diff = Math.round((now - d) / 86400000);
-    if (diff <= 0) return 'сегодня';
-    if (diff === 1) return 'вчера';
-    if (diff < 7) return diff + ' дн. назад';
+    if (diff <= 0) return t('auto.92');
+    if (diff === 1) return t('auto.93');
+    if (diff < 7) return diff + t('auto.94');
     return pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + d.getFullYear();
   }
 
@@ -269,10 +269,10 @@
   function fmtSize(bytes) {
     const b = Number(bytes) || 0;
     if (!b) return '';
-    if (b < 1024) return b + ' Б';
-    if (b < 1024 * 1024) return (b / 1024).toFixed(1).replace('.', ',') + ' КБ';
-    if (b < 1024 * 1024 * 1024) return (b / 1024 / 1024).toFixed(1).replace('.', ',') + ' МБ';
-    return (b / 1024 / 1024 / 1024).toFixed(2).replace('.', ',') + ' ГБ';
+    if (b < 1024) return b + t('auto.95');
+    if (b < 1024 * 1024) return (b / 1024).toFixed(1).replace('.', ',') + t('auto.96');
+    if (b < 1024 * 1024 * 1024) return (b / 1024 / 1024).toFixed(1).replace('.', ',') + t('auto.97');
+    return (b / 1024 / 1024 / 1024).toFixed(2).replace('.', ',') + t('auto.98');
   }
 
   function progressPct(p) {
@@ -365,7 +365,7 @@
     try {
       res = await fetch(path, opts);
     } catch (_err) {
-      const err = new Error('Нет связи с сервером');
+      const err = new Error(t('auto.99'));
       err.network = true;
       throw err;
     }
@@ -378,9 +378,9 @@
     if (!res.ok || !data || data.ok === false) {
       let message = (data && data.error) || '';
       if (!message) {
-        if (res.status === 404) message = 'API недоступен (404)';
-        else if (!data) message = 'Сервер вернул некорректный ответ';
-        else message = 'Ошибка сервера (' + res.status + ')';
+        if (res.status === 404) message = t('auto.100');
+        else if (!data) message = t('auto.101');
+        else message = t('auto.102') + res.status + ')';
       }
       const err = new Error(message);
       err.status = res.status;
@@ -463,23 +463,23 @@
 
   function updateAbout() {
     const s = state.settings;
-    const apiBase = s.api_base || 'не указан';
+    const apiBase = s.api_base || t('auto.103');
     if (ui.aboutApi) ui.aboutApi.textContent = apiBase;
-    if (ui.aboutApiMode) ui.aboutApiMode.textContent = s.local_api ? 'Локальный Bot API' : 'Облачный Bot API';
+    if (ui.aboutApiMode) ui.aboutApiMode.textContent = s.local_api ? t('auto.104') : t('auto.105');
     if (ui.aboutDownload) {
       ui.aboutDownload.textContent = s.limits.download_mb > 0
-        ? 'до ' + s.limits.download_mb + ' МБ'
-        : 'без ограничений';
+        ? t('auto.106') + s.limits.download_mb + t('auto.97')
+        : t('auto.107');
     }
     if (ui.aboutUpload) {
       ui.aboutUpload.textContent = s.limits.upload_mb > 0
-        ? 'до ' + s.limits.upload_mb + ' МБ'
-        : 'без ограничений';
+        ? t('auto.106') + s.limits.upload_mb + t('auto.97')
+        : t('auto.107');
     }
     if (ui.aboutAsr) {
       ui.aboutAsr.textContent = s.asr_model
-        ? 'включена · ' + modelTitle(s.asr_model)
-        : 'включена · модель не выбрана';
+        ? t('auto.108') + modelTitle(s.asr_model)
+        : t('auto.109');
     }
     if (ui.aboutAsrRow) ui.aboutAsrRow.hidden = !s.asr_enabled;
   }
@@ -524,10 +524,10 @@
     if (ui.connText) ui.connText.textContent = CONNECTION_TEXT[value];
     if (ui.conn) {
       ui.conn.title = value === 'online'
-        ? 'Соединение активно'
+        ? t('auto.110')
         : value === 'offline'
-          ? 'Нет связи с сервером'
-          : 'Подключение к серверу…';
+          ? t('auto.99')
+          : t('auto.111');
     }
   }
 
@@ -537,15 +537,15 @@
   }
 
   function displayName(chat) {
-    if (!chat) return 'Чат';
-    return chat.title || chat.name || (chat.username ? '@' + chat.username : 'Чат #' + chat.id);
+    if (!chat) return t('auto.112');
+    return chat.title || chat.name || (chat.username ? '@' + chat.username : t('auto.113') + chat.id);
   }
 
   function chatItemHtml(chat) {
     const active = chat.id === state.activeId;
     const name = displayName(chat);
     const unread = active ? 0 : (Number(chat.unread) || 0);
-    const last = plainPreview(chat.last_text) || 'Нет сообщений';
+    const last = plainPreview(chat.last_text) || t('auto.114');
     const badge = unread > 0
       ? '<span class="unread-badge">' + (unread > 99 ? '99+' : unread) + '</span>'
       : '';
@@ -569,7 +569,7 @@
       if (chat.id === state.activeId) return sum;
       return sum + (Number(chat.unread) || 0);
     }, 0);
-    document.title = (total > 0 ? '(' + total + ') ' : '') + APP_NAME + ' — чат';
+    document.title = (total > 0 ? '(' + total + ') ' : '') + APP_NAME + t('auto.115');
   }
 
   function renderChats(force) {
@@ -602,10 +602,10 @@
       ui.chatList.hidden = true;
       ui.chatListEmpty.hidden = false;
       const searching = query.length > 0;
-      ui.chatListEmptyTitle.textContent = searching ? 'Ничего не найдено' : 'Пока нет чатов';
+      ui.chatListEmptyTitle.textContent = searching ? t('auto.116') : t('auto.11');
       ui.chatListEmptyText.textContent = searching
-        ? 'Попробуйте изменить запрос.'
-        : 'Начните чат: напишите боту /start в Telegram.';
+        ? t('auto.117')
+        : t('auto.12');
     } else {
       ui.chatList.hidden = false;
       ui.chatListEmpty.hidden = true;
@@ -623,7 +623,7 @@
     state.usersSignature = signature;
 
     if (!state.chats.length) {
-      ui.settingsUsers.innerHTML = '<div class="list-empty">Пока нет добавленных пользователей.</div>';
+      ui.settingsUsers.innerHTML = t('auto.118');
       return;
     }
 
@@ -633,7 +633,7 @@
       const bits = [];
       if (chat.username) bits.push('@' + chat.username);
       bits.push('ID ' + chat.id);
-      bits.push(chat.allowed ? 'в поддержке' : 'не в поддержке');
+      bits.push(chat.allowed ? t('auto.119') : t('auto.120'));
       return '<div class="user-row" data-user-chat="' + esc(chat.id) + '">' +
         avatarHtml(chat.avatar_url, name, chat.id, 'avatar-sm') +
         '<div class="user-main">' +
@@ -642,10 +642,10 @@
         '</div>' +
         '<div class="user-actions">' +
           '<button class="btn ghost small" type="button" data-remove-chat="' + esc(chat.id) + '"' +
-            ' title="Запретить пользователю писать боту. История сообщений сохранится."' +
-            (chat.allowed ? '' : ' disabled') + '>Убрать доступ</button>' +
+            t('auto.121') +
+            (chat.allowed ? '' : ' disabled') + t('auto.122') +
           '<button class="btn danger small" type="button" data-delete-chat="' + esc(chat.id) + '"' +
-            ' title="Удаляет чат только в этом приложении. В Telegram переписка останется.">Удалить чат</button>' +
+            t('auto.123') +
         '</div>' +
       '</div>';
     }).join('');
@@ -665,7 +665,7 @@
       return;
     }
     ui.pendingUsers.innerHTML = state.pendingUsers.map((user) => {
-      const name = user.name || user.username || ('Пользователь ' + user.id);
+      const name = user.name || user.username || (t('auto.124') + user.id);
       const bits = [];
       if (user.username) bits.push('@' + user.username);
       bits.push('ID ' + user.id);
@@ -677,7 +677,7 @@
         '</div>' +
         '<div class="user-actions">' +
           '<button class="btn primary small" type="button" data-add-pending="' + esc(user.id) + '">' +
-            '<svg><use href="#i-user-plus"/></svg><span>Добавить</span></button>' +
+            t('auto.125') +
         '</div>' +
       '</div>';
     }).join('');
@@ -705,10 +705,10 @@
       if (data.chat) upsertChat(data.chat);
       state.pendingUsers = state.pendingUsers.filter((user) => Number(user.id) !== Number(userId));
       renderPendingUsers(true);
-      toast('Пользователь добавлен', 'success');
+      toast(t('auto.126'), 'success');
       refreshChatsSoon();
     } catch (err) {
-      toast('Не удалось добавить пользователя: ' + err.message, 'error');
+      toast(t('auto.127') + err.message, 'error');
     } finally {
       button.disabled = false;
     }
@@ -812,7 +812,7 @@
   function touchChat(chatId, text, date) {
     const chat = getChat(chatId);
     if (!chat) return;
-    chat.last_text = plainPreview(text) || 'Сообщение';
+    chat.last_text = plainPreview(text) || t('auto.27');
     chat.last_date = Number(date) || Math.floor(Date.now() / 1000);
     renderChats(true);
   }
@@ -844,7 +844,7 @@
     if (!chat) {
       const bot = state.bot || {};
       setAvatar(ui.peerAvatar, bot.avatar_url, bot.name || APP_NAME, 'bot', 'avatar-head', true);
-      ui.peerName.textContent = 'Выберите чат';
+      ui.peerName.textContent = t('auto.15');
       ui.peerSub.textContent = bot.username ? '@' + bot.username : APP_NAME;
       return;
     }
@@ -859,14 +859,14 @@
   function updateEmptyTexts() {
     const bot = state.bot || {};
     const mention = bot.username ? '@' + bot.username : '';
-    const hint = 'Напишите боту ' + (mention ? mention + ' ' : '') +
-      'команду /start — после этого переписка появится здесь.';
+    const hint = t('auto.128') + (mention ? mention + ' ' : '') +
+      t('auto.129');
 
     if (state.chats.length) {
-      ui.noChatTitle.textContent = 'Выберите чат';
-      ui.noChatText.textContent = 'Откройте переписку в списке слева или найдите пользователя, который уже писал боту.';
+      ui.noChatTitle.textContent = t('auto.15');
+      ui.noChatText.textContent = t('auto.130');
     } else {
-      ui.noChatTitle.textContent = 'Начните чат';
+      ui.noChatTitle.textContent = t('auto.21');
       ui.noChatText.textContent = hint;
     }
     ui.chatEmptyText.textContent = hint;
@@ -888,8 +888,8 @@
     ui.btnSend.disabled = !hasChat || state.sending ||
       (!ui.composerInput.value.trim() && state.pending.length === 0);
     ui.composerInput.placeholder = hasChat
-      ? 'Написать сообщение…'
-      : 'Выберите чат, чтобы написать сообщение';
+      ? t('auto.26')
+      : t('auto.131');
   }
 
   function setApiUnavailable() {
@@ -897,11 +897,11 @@
     if (state.bootstrapped) return;
     ui.chatList.hidden = true;
     ui.chatListEmpty.hidden = false;
-    ui.chatListEmptyTitle.textContent = 'Нет связи с сервером';
-    ui.chatListEmptyText.textContent = 'Проверьте, что бэкенд запущен и API доступен по этому адресу.';
+    ui.chatListEmptyTitle.textContent = t('auto.99');
+    ui.chatListEmptyText.textContent = t('auto.132');
     ui.noChat.hidden = false;
-    ui.noChatTitle.textContent = 'Нет связи с сервером';
-    ui.noChatText.textContent = 'Не удалось загрузить чаты. Проверьте подключение к API и обновите страницу.';
+    ui.noChatTitle.textContent = t('auto.99');
+    ui.noChatText.textContent = t('auto.133');
   }
 
   async function refreshConnection() {
@@ -937,7 +937,7 @@
       if (!state.bootstrapped) setApiUnavailable();
       if (!silent && !state.bootErrorShown) {
         state.bootErrorShown = true;
-        toast('Не удалось загрузить данные: ' + err.message, 'error');
+        toast(t('auto.134') + err.message, 'error');
       }
     }
   }
@@ -996,27 +996,27 @@
 
   function downloadLink(msg, className, label) {
     return '<a class="' + className + '" href="' + mediaDownloadUrl(msg.id) + '"' +
-      downloadAttrs(msg) + ' title="' + esc(label || 'Скачать') + '" aria-label="' + esc(label || 'Скачать') + '">' +
+      downloadAttrs(msg) + ' title="' + esc(label || t('auto.45')) + '" aria-label="' + esc(label || t('auto.45')) + '">' +
       icon('download') + '</a>';
   }
 
   function kindText(kind) {
     const map = {
-      photo: 'фото',
-      video: 'видео',
-      animation: 'анимацию',
-      voice: 'голосовое',
-      audio: 'аудио',
-      document: 'файл',
-      sticker: 'стикер',
-      video_note: 'видеосообщение'
+      photo: t('auto.135'),
+      video: t('auto.136'),
+      animation: t('auto.137'),
+      voice: t('auto.138'),
+      audio: t('auto.139'),
+      document: t('auto.140'),
+      sticker: t('auto.141'),
+      video_note: t('auto.142')
     };
-    return map[kind] || 'файл';
+    return map[kind] || t('auto.140');
   }
 
   function missingPlaceholder(msg, text, failed) {
     const retry = failed && isNumericId(msg.id)
-      ? '<button class="retry-btn" type="button" data-retry-media="' + esc(msg.id) + '">Повторить</button>'
+      ? '<button class="retry-btn" type="button" data-retry-media="' + esc(msg.id) + t('auto.143')
       : '';
     return '<div class="media-placeholder">' +
       (failed ? icon('warning') : '<span class="spinner"></span>') +
@@ -1026,7 +1026,7 @@
 
   function uploadCard(msg) {
     const media = msg.media || {};
-    const name = media.file_name || 'Файл';
+    const name = media.file_name || t('auto.144');
     return '<div class="upload-card" data-upload="' + esc(msg.id) + '">' +
       '<div class="upload-row">' +
         '<span class="spinner tiny"></span>' +
@@ -1049,7 +1049,7 @@
   function audioPlayerHtml(msg) {
     const media = msg.media || {};
     const title = media.title || media.performer || media.file_name ||
-      (msg.kind === 'voice' ? 'Голосовое сообщение' : 'Аудио');
+      (msg.kind === 'voice' ? t('auto.145') : t('auto.146'));
     const duration = Number(media.duration) || 0;
     const bars = [];
     for (let i = 0; i < 26; i += 1) {
@@ -1057,7 +1057,7 @@
       bars.push('<i style="height:' + height + '%"></i>');
     }
     return '<div class="audio-card" data-audio="' + esc(msg.id) + '">' +
-      '<button class="audio-btn" type="button" title="Воспроизвести" aria-label="Воспроизвести">' + icon('play') + '</button>' +
+      t('auto.147') + icon('play') + '</button>' +
       '<div class="audio-main">' +
         '<div class="audio-title">' + esc(title) + '</div>' +
         '<div class="wave">' + bars.join('') + '</div>' +
@@ -1071,7 +1071,7 @@
     const src = mediaSrc(msg);
     return '<div class="media photo-media">' +
       '<img class="photo" src="' + esc(src) + '" data-full="' + esc(src) +
-        '" data-download="' + esc(mediaDownloadUrl(msg.id)) + '" alt="' + esc(label || 'Фото') +
+        '" data-download="' + esc(mediaDownloadUrl(msg.id)) + '" alt="' + esc(label || t('auto.148')) +
         '"' + (animation ? ' data-anim="1"' : '') + ' loading="lazy">' +
     '</div>';
   }
@@ -1096,15 +1096,15 @@
 
     if (!msg.local) {
       if (msg.error) {
-        return missingPlaceholder(msg, 'Не удалось загрузить ' + kindText(kind) +
+        return missingPlaceholder(msg, t('auto.149') + kindText(kind) +
           (name ? ': ' + name : ''), true);
       }
-      const label = 'Загрузка ' + kindText(kind) + (name ? ': ' + name : '') + '…';
+      const label = t('auto.150') + kindText(kind) + (name ? ': ' + name : '') + '…';
       return missingPlaceholder(msg, label, false);
     }
 
     if (kind === 'photo') {
-      return photoHtml(msg, 'Фото');
+      return photoHtml(msg, t('auto.148'));
     }
     if (kind === 'video') {
       return videoHtml(msg, false);
@@ -1121,7 +1121,7 @@
     }
     if (kind === 'sticker') {
       return '<div class="media sticker">' +
-        '<img src="' + esc(mediaSrc(msg)) + '" alt="Стикер" loading="lazy">' +
+        '<img src="' + esc(mediaSrc(msg)) + t('auto.151') +
       '</div>';
     }
     if (kind === 'audio' || kind === 'voice') {
@@ -1132,13 +1132,13 @@
       return '<div class="file-card">' +
         '<span class="file-ico">' + icon(fileIcon(media.mime_type, name)) + '</span>' +
         '<span class="file-main">' +
-          '<span class="file-name">' + esc(name || 'Файл') + '</span>' +
-          '<span class="file-size">' + esc(size || 'файл') + '</span>' +
+          '<span class="file-name">' + esc(name || t('auto.144')) + '</span>' +
+          '<span class="file-size">' + esc(size || t('auto.140')) + '</span>' +
         '</span>' +
       '</div>';
     }
-    if (media.is_image) return photoHtml(msg, 'Изображение');
-    return missingPlaceholder(msg, 'Вложение', false);
+    if (media.is_image) return photoHtml(msg, t('auto.152'));
+    return missingPlaceholder(msg, t('auto.153'), false);
   }
 
   function buildTranscript(msg) {
@@ -1153,11 +1153,11 @@
       const head = document.createElement('div');
       head.className = 'tr-head';
       const label = document.createElement('span');
-      label.textContent = 'Расшифровка';
+      label.textContent = t('auto.33');
       const toggle = document.createElement('button');
       toggle.type = 'button';
       toggle.className = 'tr-toggle';
-      toggle.textContent = 'Скрыть';
+      toggle.textContent = t('auto.154');
       head.appendChild(label);
       head.appendChild(toggle);
 
@@ -1167,7 +1167,7 @@
 
       toggle.addEventListener('click', () => {
         body.hidden = !body.hidden;
-        toggle.textContent = body.hidden ? 'Показать' : 'Скрыть';
+        toggle.textContent = body.hidden ? t('auto.155') : t('auto.154');
       });
 
       wrap.appendChild(head);
@@ -1178,18 +1178,18 @@
     const tstate = msg.transcript_state || '';
     const busy = state.transcribing.has(msg.id) || tstate === 'queued' || tstate === 'running';
     const label = tstate === 'queued'
-      ? 'В очереди…'
+      ? t('auto.156')
       : busy
-        ? 'Расшифровка…'
+        ? t('auto.157')
         : tstate === 'error'
-          ? 'Повторить'
-          : 'Расшифровать';
+          ? t('auto.158')
+          : t('auto.159');
 
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'tr-btn';
     button.dataset.transcribe = String(msg.id);
-    button.title = 'Распознать речь';
+    button.title = t('auto.160');
     button.disabled = busy;
     button.innerHTML = icon('text') + '<span>' + label + '</span>';
     wrap.appendChild(button);
@@ -1205,12 +1205,12 @@
 
   function statusTick(msg) {
     if (msg.status === 'failed') {
-      return '<span class="tick fail" title="Не отправлено">' + icon('warning') + '</span>';
+      return t('auto.161') + icon('warning') + '</span>';
     }
     if (msg.status === 'pending') {
-      return '<span class="tick" title="Отправляется"><span class="spinner tiny"></span></span>';
+      return t('auto.162');
     }
-    return '<span class="tick" title="Отправлено">' + icon('check') + '</span>';
+    return t('auto.163') + icon('check') + '</span>';
   }
 
   function firstLink(text) {
@@ -1235,7 +1235,7 @@
     const card = document.createElement('div');
     card.className = 'link-preview loading';
     card.dataset.url = url;
-    card.innerHTML = '<div class="lp-loading"><span class="spinner"></span><span>Загрузка превью…</span></div>';
+    card.innerHTML = t('auto.164');
 
     card.addEventListener('click', (event) => {
       event.preventDefault();
@@ -1277,7 +1277,7 @@
       }
       html += '<div class="lp-body">' +
         (site ? '<div class="lp-site">' + esc(site) + '</div>' : '') +
-        '<div class="lp-title">' + esc(data.title || site || 'Ссылка') + '</div>' +
+        '<div class="lp-title">' + esc(data.title || site || t('auto.165')) + '</div>' +
         (data.description ? '<div class="lp-desc">' + esc(data.description) + '</div>' : '') +
         '</div>';
       card.innerHTML = html;
@@ -1332,8 +1332,8 @@
       fwd.className = 'fwd';
       const isChannel = msg.fwd.type === 'channel' || msg.fwd.type === 'chat';
       const label = isChannel
-        ? 'Переслано из: «' + (msg.fwd.name || 'канала') + '»'
-        : 'Переслано от: ' + (msg.fwd.name || 'пользователя');
+        ? t('auto.166') + (msg.fwd.name || t('auto.167')) + '»'
+        : t('auto.168') + (msg.fwd.name || t('auto.169'));
       fwd.innerHTML = icon('forward') + '<span>' + esc(label) + '</span>' +
         (msg.fwd.username && !isChannel ? '<span class="fwd-user">@' + esc(msg.fwd.username) + '</span>' : '');
       bubble.appendChild(fwd);
@@ -1374,7 +1374,7 @@
     if (msg.edited) {
       const edited = document.createElement('span');
       edited.className = 'edited';
-      edited.textContent = 'изм.';
+      edited.textContent = t('auto.170');
       meta.appendChild(edited);
     }
     if (msg.dir === 'out') {
@@ -1420,8 +1420,8 @@
 
       const setIcon = (playing) => {
         button.innerHTML = icon(playing ? 'pause' : 'play');
-        button.title = playing ? 'Пауза' : 'Воспроизвести';
-        button.setAttribute('aria-label', playing ? 'Пауза' : 'Воспроизвести');
+        button.title = playing ? t('auto.171') : t('auto.172');
+        button.setAttribute('aria-label', playing ? t('auto.171') : t('auto.172'));
       };
       const paint = () => {
         const total = audio.duration || 0;
@@ -1489,7 +1489,7 @@
     ui.loadOlderWrap.hidden = !visible;
     ui.loadOlder.disabled = state.loadingOlder;
     ui.loadOlderSpin.hidden = !state.loadingOlder;
-    ui.loadOlderLabel.textContent = state.loadingOlder ? 'Загрузка…' : 'Загрузить раньше';
+    ui.loadOlderLabel.textContent = state.loadingOlder ? t('auto.173') : t('auto.16');
   }
 
   function renderFeed() {
@@ -1565,7 +1565,7 @@
   function updateChatFromMessage(msg) {
     const chat = getChat(state.activeId);
     if (!chat) return;
-    chat.last_text = plainPreview(msg.text || msg.caption || kindText(msg.kind)) || 'Сообщение';
+    chat.last_text = plainPreview(msg.text || msg.caption || kindText(msg.kind)) || t('auto.27');
     chat.last_date = Number(msg.date) || chat.last_date;
     renderChats(true);
   }
@@ -1652,7 +1652,7 @@
       if (state.activeId !== chatId || state.loadToken !== token) return;
       state.loadingMessages = false;
       updateOverlays();
-      toast('Не удалось загрузить сообщения: ' + err.message, 'error');
+      toast(t('auto.174') + err.message, 'error');
       if (isOfflineError(err)) markOffline();
     }
   }
@@ -1715,7 +1715,7 @@
       setScrollTop(prevTop + (ui.messages.scrollHeight - prevHeight));
       state.olderCooldownUntil = Date.now() + 600;
     } catch (err) {
-      toast('Не удалось загрузить историю: ' + err.message, 'error');
+      toast(t('auto.175') + err.message, 'error');
       if (isOfflineError(err)) markOffline();
     } finally {
       if (state.activeId === chatId && state.loadToken === token) {
@@ -1792,7 +1792,7 @@
       name.textContent = file.name;
       const size = document.createElement('div');
       size.className = 'chip-size';
-      size.textContent = fmtSize(file.size) || 'файл';
+      size.textContent = fmtSize(file.size) || t('auto.140');
       main.appendChild(name);
       main.appendChild(size);
       chip.appendChild(main);
@@ -1800,7 +1800,7 @@
       const remove = document.createElement('button');
       remove.className = 'chip-x';
       remove.type = 'button';
-      remove.title = 'Убрать';
+      remove.title = t('auto.176');
       remove.innerHTML = icon('close');
       remove.addEventListener('click', () => {
         state.pending.splice(index, 1);
@@ -1815,14 +1815,14 @@
 
   function addFiles(files) {
     if (!state.activeId) {
-      toast('Сначала выберите чат', 'error');
+      toast(t('auto.177'), 'error');
       return;
     }
     const limit = Number(state.settings.limits.upload_mb) || 0;
     Array.from(files || []).forEach((file) => {
       if (!file || !file.size) return;
       if (limit > 0 && file.size > limit * 1024 * 1024) {
-        toast('«' + file.name + '» больше ' + limit + ' МБ — не помещается в лимит загрузки', 'error');
+        toast('«' + file.name + t('auto.178') + limit + t('auto.179'), 'error');
         return;
       }
       state.pending.push(file);
@@ -1934,7 +1934,7 @@
         ui.composerInput.value = text;
         autosize();
       }
-      toast('Не удалось отправить: ' + err.message, 'error');
+      toast(t('auto.180') + err.message, 'error');
       if (isOfflineError(err)) markOffline();
     } finally {
       state.sending = false;
@@ -1948,7 +1948,7 @@
     const limit = Number(state.settings.limits.upload_mb) || 0;
     const allowed = files.filter((file) => {
       if (limit > 0 && file.size > limit * 1024 * 1024) {
-        toast('«' + file.name + '» больше ' + limit + ' МБ — не помещается в лимит загрузки', 'error');
+        toast('«' + file.name + t('auto.178') + limit + t('auto.179'), 'error');
         return false;
       }
       return true;
@@ -1986,14 +1986,14 @@
         (payload.messages || []).forEach((msg) => {
           if (state.activeId === chatId) mergeMessage(msg, isNearBottom());
         });
-        touchChat(chatId, caption || (allowed[0] && allowed[0].name) || 'Файл',
+        touchChat(chatId, caption || (allowed[0] && allowed[0].name) || t('auto.144'),
           Math.floor(Date.now() / 1000));
         state.drafts.delete(chatId);
         state.draftFiles.delete(chatId);
         refreshChatsSoon();
         if (state.activeId === chatId && isNearBottom()) scrollBottom(false);
       } else {
-        const message = errorText || 'Не удалось отправить файл';
+        const message = errorText || t('auto.181');
         temps.forEach((temp) => temp.fail(message));
         toast(message, 'error');
       }
@@ -2010,12 +2010,12 @@
       if (xhr.status >= 200 && xhr.status < 300 && data && data.ok) {
         finish(true, data, '');
       } else {
-        finish(false, data, (data && data.error) || 'Не удалось отправить файл');
+        finish(false, data, (data && data.error) || t('auto.181'));
         if (xhr.status >= 500) markOffline();
       }
     };
     xhr.onerror = () => {
-      finish(false, null, 'Нет связи с сервером');
+      finish(false, null, t('auto.99'));
       markOffline();
     };
     xhr.send(form);
@@ -2038,8 +2038,8 @@
       ui.composerInput.value = value.slice(0, lineStart) + quoted + value.slice(stop);
       ui.composerInput.selectionStart = lineStart;
       ui.composerInput.selectionEnd = lineStart + quoted.length;
-    } else if (marker === '[текст](url)') {
-      const label = selected || 'текст';
+    } else if (marker === t('auto.182')) {
+      const label = selected || t('auto.183');
       const insert = '[' + label + '](url)';
       ui.composerInput.value = value.slice(0, start) + insert + value.slice(end);
       if (selected) {
@@ -2071,7 +2071,7 @@
     if (!numeric) return;
     if (button) {
       button.disabled = true;
-      button.textContent = 'Загрузка…';
+      button.textContent = t('auto.173');
     }
     try {
       const data = await api('/api/retry_media', {
@@ -2083,7 +2083,7 @@
       toast(err.message, 'error');
       if (button) {
         button.disabled = false;
-        button.textContent = 'Повторить';
+        button.textContent = t('auto.158');
       }
     }
   }
@@ -2096,7 +2096,7 @@
     if (button) {
       button.disabled = true;
       const label = button.querySelector('span');
-      if (label) label.textContent = 'Расшифровка…';
+      if (label) label.textContent = t('auto.157');
     }
     try {
       const data = await api('/api/transcribe', {
@@ -2144,7 +2144,7 @@
 
     if (!models.length) {
       ui.asrModel.innerHTML = '<option value="">' +
-        (state.asrError ? 'Модели недоступны' : 'Модели не найдены') + '</option>';
+        (state.asrError ? t('auto.184') : t('auto.185')) + '</option>';
       ui.asrModel.disabled = true;
     } else {
       ui.asrModel.disabled = false;
@@ -2152,8 +2152,8 @@
         const bits = [model.title || model.id];
         if (model.language) bits.push(model.language);
         if (Number(model.size_mb) > 0) bits.push(fmtSize(Number(model.size_mb) * 1024 * 1024));
-        if (model.downloaded) bits.push('скачана');
-        else if (model.downloading) bits.push('скачивается');
+        if (model.downloaded) bits.push(t('auto.186'));
+        else if (model.downloading) bits.push(t('auto.187'));
         return '<option value="' + esc(model.id) + '"' +
           (model.id === selectedId ? ' selected' : '') + '>' + esc(bits.join(' · ')) + '</option>';
       }).join('');
@@ -2164,45 +2164,45 @@
     if (ui.asrProgress) ui.asrProgress.hidden = true;
     if (ui.btnAsrDownload) {
       ui.btnAsrDownload.disabled = true;
-      ui.btnAsrDownload.innerHTML = icon('download') + '<span>Скачать</span>';
+      ui.btnAsrDownload.innerHTML = icon('download') + t('auto.188');
     }
 
     if (state.asrError) {
-      ui.asrStatus.textContent = 'Ошибка: ' + state.asrError;
+      ui.asrStatus.textContent = t('auto.189') + state.asrError;
       ui.asrStatus.classList.add('err');
       return;
     }
     if (!models.length) {
-      ui.asrStatus.textContent = 'Модели не найдены. Проверьте сервис расшифровки на сервере.';
+      ui.asrStatus.textContent = t('auto.190');
       return;
     }
     if (!selected) {
-      ui.asrStatus.textContent = 'Выберите модель распознавания.';
+      ui.asrStatus.textContent = t('auto.191');
       return;
     }
 
     const pct = progressPct(selected.progress);
     if (selected.downloading) {
-      ui.asrStatus.textContent = 'Скачивание модели: ' + Math.round(pct) + '%';
+      ui.asrStatus.textContent = t('auto.192') + Math.round(pct) + '%';
       ui.asrStatus.classList.add('warn');
       if (ui.asrProgress) ui.asrProgress.hidden = false;
       if (ui.asrProgressBar) ui.asrProgressBar.style.width = pct + '%';
       ui.btnAsrDownload.disabled = true;
-      ui.btnAsrDownload.innerHTML = icon('download') + '<span>Скачивание…</span>';
+      ui.btnAsrDownload.innerHTML = icon('download') + t('auto.193');
     } else if (selected.error) {
-      ui.asrStatus.textContent = 'Ошибка скачивания: ' + selected.error;
+      ui.asrStatus.textContent = t('auto.194') + selected.error;
       ui.asrStatus.classList.add('err');
       ui.btnAsrDownload.disabled = false;
-      ui.btnAsrDownload.innerHTML = icon('refresh') + '<span>Повторить</span>';
+      ui.btnAsrDownload.innerHTML = icon('refresh') + t('auto.195');
     } else if (selected.downloaded) {
-      ui.asrStatus.textContent = 'Модель скачана. Загружается в память только на время расшифровки.';
+      ui.asrStatus.textContent = t('auto.196');
       ui.asrStatus.classList.add('ok');
       ui.btnAsrDownload.disabled = true;
-      ui.btnAsrDownload.innerHTML = icon('check') + '<span>Модель скачана</span>';
+      ui.btnAsrDownload.innerHTML = icon('check') + t('auto.197');
     } else {
-      ui.asrStatus.textContent = 'Модель не скачана. Нажмите «Скачать», чтобы начать.';
+      ui.asrStatus.textContent = t('auto.198');
       ui.btnAsrDownload.disabled = false;
-      ui.btnAsrDownload.innerHTML = icon('download') + '<span>Скачать</span>';
+      ui.btnAsrDownload.innerHTML = icon('download') + t('auto.188');
     }
   }
 
@@ -2213,7 +2213,7 @@
     if (ui.btnAsrRefresh) ui.btnAsrRefresh.disabled = true;
     if (!silent && ui.asrStatus) {
       ui.asrStatus.className = 'asr-status';
-      ui.asrStatus.textContent = 'Загрузка списка моделей…';
+      ui.asrStatus.textContent = t('auto.42');
     }
 
     let modelsData = null;
@@ -2240,7 +2240,7 @@
     if (statusData && statusData.active) state.asrActive = statusData.active;
 
     if (!modelsData && !statusData) {
-      state.asrError = firstError || 'Не удалось получить список моделей';
+      state.asrError = firstError || t('auto.199');
     }
     state.asrLoading = false;
     if (ui.btnAsrRefresh) ui.btnAsrRefresh.disabled = false;
@@ -2274,9 +2274,9 @@
       model.error = '';
       renderAsr();
       scheduleAsrPoll();
-      toast('Скачивание модели началось', 'info');
+      toast(t('auto.200'), 'info');
     } catch (err) {
-      toast('Не удалось начать скачивание: ' + err.message, 'error');
+      toast(t('auto.201') + err.message, 'error');
       renderAsr();
     }
   }
@@ -2291,7 +2291,7 @@
     } catch (err) {
       state.settings.asr_model = previous;
       renderAsr();
-      toast('Не удалось сохранить модель: ' + err.message, 'error');
+      toast(t('auto.202') + err.message, 'error');
     }
   }
 
@@ -2312,7 +2312,7 @@
       if (input) input.checked = previous;
       updateSettingsControls();
       if (key === 'asr_enabled' && state.activeId) renderFeed();
-      toast('Не удалось сохранить настройку: ' + err.message, 'error');
+      toast(t('auto.203') + err.message, 'error');
     }
   }
 
@@ -2324,7 +2324,7 @@
     try {
       await saveSetting('theme', theme);
     } catch (err) {
-      toast('Тема применена локально, но не сохранена: ' + err.message, 'error');
+      toast(t('auto.204') + err.message, 'error');
     }
   }
 
@@ -2339,17 +2339,17 @@
       if (chat) chat.allowed = false;
       renderSettingsUsers(true);
       renderChats(true);
-      toast('Пользователь убран из поддержки', 'success');
+      toast(t('auto.205'), 'success');
       refreshChatsSoon();
     } catch (err) {
-      toast('Не удалось убрать пользователя: ' + err.message, 'error');
+      toast(t('auto.206') + err.message, 'error');
     }
   }
 
   async function deleteChat(chatId) {
     const chat = getChat(chatId);
-    const name = chat ? displayName(chat) : 'этот чат';
-    if (!window.confirm('Удалить чат с «' + name + '»? Он исчезнет только из этого приложения, в Telegram переписка останется.')) return;
+    const name = chat ? displayName(chat) : t('auto.207');
+    if (!window.confirm(t('auto.208') + name + t('auto.209'))) return;
     try {
       await api('/api/chats/delete', {
         method: 'POST',
@@ -2364,10 +2364,10 @@
       updateChatHeader();
       updateOverlays();
       updateComposer();
-      toast('Чат удалён из приложения', 'success');
+      toast(t('auto.210'), 'success');
       refreshChatsSoon();
     } catch (err) {
-      toast('Не удалось удалить чат: ' + err.message, 'error');
+      toast(t('auto.211') + err.message, 'error');
     }
   }
 
@@ -2383,7 +2383,7 @@
   async function submitAddUser() {
     const raw = ui.addUserInput.value.trim();
     if (!raw) {
-      toast('Укажите ID или @username', 'error');
+      toast(t('auto.212'), 'error');
       ui.addUserInput.focus();
       return;
     }
@@ -2391,7 +2391,7 @@
     if (raw.charAt(0) === '@') {
       const username = raw.slice(1).trim();
       if (!username) {
-        toast('Укажите username после @', 'error');
+        toast(t('auto.213'), 'error');
         return;
       }
       payload = { username: username };
@@ -2409,10 +2409,10 @@
       });
       if (data.chat) upsertChat(data.chat);
       ui.addUserInput.value = '';
-      toast('Пользователь добавлен', 'success');
+      toast(t('auto.126'), 'success');
       refreshChatsSoon();
     } catch (err) {
-      toast('Не удалось добавить пользователя: ' + err.message, 'error');
+      toast(t('auto.127') + err.message, 'error');
     } finally {
       ui.btnAddUser.disabled = false;
     }
@@ -2422,7 +2422,7 @@
   function renderFindUsers() {
     if (state.findLoading) {
       ui.findList.hidden = false;
-      ui.findList.innerHTML = '<div class="find-loading"><span class="spinner"></span><span>Поиск…</span></div>';
+      ui.findList.innerHTML = t('auto.214');
       ui.findEmpty.hidden = true;
       return;
     }
@@ -2431,20 +2431,20 @@
       ui.findList.innerHTML = '';
       ui.findEmpty.hidden = false;
       const searching = state.findQuery.trim().length > 0;
-      ui.findEmptyTitle.textContent = searching ? 'Никого не нашли' : 'Пока никого нет';
+      ui.findEmptyTitle.textContent = searching ? t('auto.58') : t('auto.215');
       ui.findEmptyText.textContent = searching
-        ? 'Попробуйте изменить имя, @username или ID.'
-        : 'Напишите боту /start в Telegram — пользователь появится в этом списке.';
+        ? t('auto.216')
+        : t('auto.59');
       return;
     }
     ui.findList.hidden = false;
     ui.findEmpty.hidden = true;
     ui.findList.innerHTML = state.findUsers.map((user) => {
-      const name = user.name || user.username || ('Пользователь ' + user.id);
+      const name = user.name || user.username || (t('auto.124') + user.id);
       const bits = [];
       if (user.username) bits.push('@' + user.username);
       bits.push('ID ' + user.id);
-      if (user.last_seen) bits.push('был(а) ' + relDate(user.last_seen));
+      if (user.last_seen) bits.push(t('auto.217') + relDate(user.last_seen));
       return '<div class="person-row" data-known-user="' + esc(user.id) + '">' +
         avatarHtml(user.avatar_url, name, user.id, '') +
         '<div class="person-main">' +
@@ -2454,7 +2454,7 @@
         '<div class="person-add">' +
           '<button class="btn ' + (user.allowed ? 'ghost' : 'primary') + ' small" type="button" data-add-known="' +
             esc(user.id) + '"' + (user.allowed ? ' disabled' : '') + '>' +
-            (user.allowed ? 'Уже добавлен' : 'Добавить') +
+            (user.allowed ? t('auto.218') : t('auto.50')) +
           '</button>' +
         '</div>' +
       '</div>';
@@ -2479,7 +2479,7 @@
       ui.findList.hidden = true;
       ui.findList.innerHTML = '';
       ui.findEmpty.hidden = false;
-      ui.findEmptyTitle.textContent = 'Не удалось загрузить список';
+      ui.findEmptyTitle.textContent = t('auto.219');
       ui.findEmptyText.textContent = err.message;
       if (isOfflineError(err)) markOffline();
     }
@@ -2496,11 +2496,11 @@
       if (user) user.allowed = true;
       if (data.chat) upsertChat(data.chat);
       renderFindUsers();
-      toast('Пользователь добавлен в чаты', 'success');
+      toast(t('auto.220'), 'success');
       refreshChatsSoon();
     } catch (err) {
       if (button) button.disabled = false;
-      toast('Не удалось добавить: ' + err.message, 'error');
+      toast(t('auto.221') + err.message, 'error');
     }
   }
 
@@ -2586,14 +2586,14 @@
     ui.lightboxImg.hidden = false;
     ui.lightbox.classList.remove('anim');
     ui.lightboxImg.src = src;
-    ui.lightboxImg.alt = alt || 'Изображение';
+    ui.lightboxImg.alt = alt || t('auto.152');
     ui.lightbox.hidden = false;
     if (ui.lightboxClose) ui.lightboxClose.focus();
   }
 
   function openAnimationLightbox(src, alt) {
     if (!src || !ui.lightboxVideo) {
-      openLightbox(src, '', alt || 'Анимация');
+      openLightbox(src, '', alt || t('auto.222'));
       return;
     }
     ui.lightboxImg.hidden = true;
@@ -2694,7 +2694,7 @@
     try {
       const result = await window.pywebview.api.save_media(String(msg.id), downloadName(msg));
       if (result && result.ok) {
-        toast('Сохранено: ' + result.path, 'success');
+        toast(t('auto.223') + result.path, 'success');
         return true;
       }
       if (result && result.cancelled) return true;
@@ -2704,7 +2704,7 @@
       }
       return false;
     } catch (err) {
-      toast('Не удалось сохранить файл: ' + err.message, 'error');
+      toast(t('auto.224') + err.message, 'error');
       return true;
     }
   }
@@ -2723,7 +2723,7 @@
     if (!isImageMessage(msg)) return;
     try {
       const response = await fetch(mediaSrc(msg));
-      if (!response.ok) throw new Error('файл не найден');
+      if (!response.ok) throw new Error(t('auto.225'));
       const blob = await response.blob();
       const bitmap = await createImageBitmap(blob);
       const canvas = document.createElement('canvas');
@@ -2731,13 +2731,13 @@
       canvas.height = bitmap.height;
       canvas.getContext('2d').drawImage(bitmap, 0, 0);
       const png = await new Promise((resolve, reject) => {
-        canvas.toBlob((result) => result ? resolve(result) : reject(new Error('не удалось преобразовать')), 'image/png');
+        canvas.toBlob((result) => result ? resolve(result) : reject(new Error(t('auto.226'))), 'image/png');
       });
-      if (!navigator.clipboard || !window.ClipboardItem) throw new Error('буфер не поддерживает изображения');
+      if (!navigator.clipboard || !window.ClipboardItem) throw new Error(t('auto.227'));
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
-      toast('Изображение скопировано', 'success');
+      toast(t('auto.228'), 'success');
     } catch (err) {
-      toast('Не удалось скопировать изображение. Сохраните его кнопкой скачивания.', 'error');
+      toast(t('auto.229'), 'error');
     }
   }
 
@@ -2746,7 +2746,7 @@
       row.classList.toggle('selected', state.selected.has(Number(row.dataset.id)));
     });
     if (ui.selectionCount) {
-      ui.selectionCount.textContent = 'Выбрано ' + state.selected.size;
+      ui.selectionCount.textContent = t('auto.230') + state.selected.size;
     }
   }
 
@@ -2769,17 +2769,17 @@
   async function copySelectedMessages() {
     const messages = sortedMessages().filter((msg) => state.selected.has(Number(msg.id)));
     if (!messages.length) {
-      toast('Ничего не выбрано', 'error');
+      toast(t('auto.231'), 'error');
       return;
     }
     const text = messages.map(messageTextForCopy).filter(Boolean).join('\n\n');
     if (text) {
       try {
         await copyText(text);
-        toast('Скопировано сообщений: ' + messages.length, 'success');
+        toast(t('auto.232') + messages.length, 'success');
         setSelectionMode(false);
       } catch (err) {
-        toast('Не удалось скопировать: ' + err.message, 'error');
+        toast(t('auto.233') + err.message, 'error');
       }
       return;
     }
@@ -2787,7 +2787,7 @@
       await copyImage(messages[0]);
       return;
     }
-    toast('В выбранных сообщениях нет текста', 'error');
+    toast(t('auto.234'), 'error');
   }
 
   function hideContextMenu() {
@@ -2876,7 +2876,7 @@
           copy.textContent = '✓';
           setTimeout(() => { copy.textContent = '⧉'; }, 1200);
         } catch (_err) {
-          toast('Не удалось скопировать', 'error');
+          toast(t('auto.235'), 'error');
         }
         return;
       }
@@ -2912,7 +2912,7 @@
       const animation = target.closest('video[data-anim="1"]');
       if (animation) {
         event.preventDefault();
-        openAnimationLightbox(animation.currentSrc || animation.src, 'Анимация');
+        openAnimationLightbox(animation.currentSrc || animation.src, t('auto.222'));
       }
     });
 
@@ -3010,8 +3010,8 @@
         const action = button.dataset.ctx;
         hideContextMenu();
         if (action === 'copy') {
-          try { await copyText(messageTextForCopy(msg)); toast('Скопировано', 'success'); }
-          catch (err) { toast('Не удалось скопировать: ' + err.message, 'error'); }
+          try { await copyText(messageTextForCopy(msg)); toast(t('auto.236'), 'success'); }
+          catch (err) { toast(t('auto.233') + err.message, 'error'); }
         } else if (action === 'copy-image') {
           copyImage(msg);
         } else if (action === 'select') {

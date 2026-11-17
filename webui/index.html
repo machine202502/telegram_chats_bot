@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0b141a" id="metaTheme">
-<title>telegram_chats_bot — чат</title>
+<title data-i18n="auto.1"></title>
 <link rel="icon" type="image/png" href="/static/icon.png">
 <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
 <link rel="stylesheet" href="style.css">
@@ -59,33 +59,33 @@
 </svg>
 
 <div class="app" id="app">
-  <aside class="sidebar" id="sidebar" aria-label="Список чатов">
+  <aside class="sidebar" id="sidebar" aria-label="" data-i18n-aria-label="auto.2">
     <div class="sidebar-head">
       <div class="brand">
         <div class="brand-logo" aria-hidden="true"><img src="/static/icon.png" alt=""></div>
         <div class="brand-text">
-          <h1 class="brand-title">Чаты</h1>
-          <div class="conn" id="conn" title="Состояние соединения">
+          <h1 class="brand-title" data-i18n="auto.3"></h1>
+          <div class="conn" id="conn" title="" data-i18n-title="auto.4">
             <span class="conn-dot" id="connDot"></span>
-            <span class="conn-text" id="connText">подключение…</span>
+            <span class="conn-text" id="connText" data-i18n="auto.5"></span>
           </div>
         </div>
         <div class="brand-actions">
-          <button class="icon-btn brand-btn" id="btnFindUser" type="button" title="Люди, писавшие боту" aria-label="Люди, писавшие боту">
+          <button class="icon-btn brand-btn" id="btnFindUser" type="button" title="" aria-label="" data-i18n-title="auto.6" data-i18n-aria-label="auto.6">
             <svg><use href="#i-user-plus"/></svg>
           </button>
-          <button class="icon-btn brand-btn" id="btnSettings" type="button" title="Настройки" aria-label="Настройки">
+          <button class="icon-btn brand-btn" id="btnSettings" type="button" title="" aria-label="" data-i18n-title="auto.7" data-i18n-aria-label="auto.7">
             <svg><use href="#i-gear"/></svg>
           </button>
         </div>
-        <button class="icon-btn sidebar-close" id="btnSidebarClose" type="button" aria-label="Закрыть список чатов">
+        <button class="icon-btn sidebar-close" id="btnSidebarClose" type="button" aria-label="" data-i18n-aria-label="auto.8">
           <svg><use href="#i-close"/></svg>
         </button>
       </div>
       <div class="search-box">
         <svg class="search-ico" aria-hidden="true"><use href="#i-search"/></svg>
-        <input id="chatSearch" type="text" placeholder="Поиск по чатам" autocomplete="off" spellcheck="false" aria-label="Поиск по чатам">
-        <button class="search-clear" id="btnSearchClear" type="button" aria-label="Очистить поиск" hidden>
+        <input id="chatSearch" type="text" placeholder="" autocomplete="off" spellcheck="false" aria-label="" data-i18n-placeholder="auto.9" data-i18n-aria-label="auto.9">
+        <button class="search-clear" id="btnSearchClear" type="button" aria-label="" hidden data-i18n-aria-label="auto.10">
           <svg><use href="#i-close"/></svg>
         </button>
       </div>
@@ -94,29 +94,29 @@
     <div class="chat-list" id="chatList"></div>
     <div class="chat-list-empty" id="chatListEmpty" hidden>
       <div class="cle-icon"><svg><use href="#i-users"/></svg></div>
-      <div class="cle-title" id="chatListEmptyTitle">Пока нет чатов</div>
-      <div class="cle-text" id="chatListEmptyText">Начните чат: напишите боту /start в Telegram.</div>
+      <div class="cle-title" id="chatListEmptyTitle" data-i18n="auto.11"></div>
+      <div class="cle-text" id="chatListEmptyText" data-i18n="auto.12"></div>
     </div>
   </aside>
 
-  <div class="sidebar-resizer" id="sidebarResizer" role="separator" aria-orientation="vertical" aria-label="Изменить ширину списка чатов"></div>
+  <div class="sidebar-resizer" id="sidebarResizer" role="separator" aria-orientation="vertical" aria-label="" data-i18n-aria-label="auto.13"></div>
 
   <div class="sidebar-backdrop" id="sidebarBackdrop" hidden></div>
 
   <main class="chat" id="chatPanel">
     <header class="chat-head" id="chatHead">
-      <button class="icon-btn burger" id="btnBurger" type="button" aria-label="Открыть список чатов">
+      <button class="icon-btn burger" id="btnBurger" type="button" aria-label="" data-i18n-aria-label="auto.14">
         <svg><use href="#i-menu"/></svg>
       </button>
       <div class="peer">
         <div class="avatar avatar-head" id="peerAvatar"></div>
         <div class="peer-text">
-          <div class="peer-name" id="peerName">Выберите чат</div>
+          <div class="peer-name" id="peerName" data-i18n="auto.15"></div>
           <div class="peer-sub" id="peerSub">telegram_chats_bot</div>
         </div>
       </div>
       <div class="chat-head-actions">
-        <button class="icon-btn mobile-only" id="btnSettingsMobile" type="button" aria-label="Настройки">
+        <button class="icon-btn mobile-only" id="btnSettingsMobile" type="button" aria-label="" data-i18n-aria-label="auto.7">
           <svg><use href="#i-gear"/></svg>
         </button>
       </div>
@@ -127,38 +127,38 @@
         <div class="load-older-wrap" id="loadOlderWrap" hidden>
           <button class="load-older" id="loadOlder" type="button">
             <span class="spinner tiny" id="loadOlderSpin" hidden></span>
-            <span id="loadOlderLabel">Загрузить раньше</span>
+            <span id="loadOlderLabel" data-i18n="auto.16"></span>
           </button>
         </div>
         <div class="feed" id="feed"></div>
       </div>
 
-      <button class="scroll-down" id="scrollDown" type="button" hidden aria-label="Показать новые сообщения">
+      <button class="scroll-down" id="scrollDown" type="button" hidden aria-label="" data-i18n-aria-label="auto.17">
         <svg><use href="#i-arrow-down"/></svg>
         <span class="badge" id="scrollBadge" hidden>0</span>
       </button>
 
       <div class="selection-bar" id="selectionBar" hidden>
-        <button class="icon-btn" id="btnSelectionClose" type="button" aria-label="Отменить выбор">
+        <button class="icon-btn" id="btnSelectionClose" type="button" aria-label="" data-i18n-aria-label="auto.18">
           <svg><use href="#i-close"/></svg>
         </button>
-        <span class="selection-count" id="selectionCount">Выбрано 0</span>
+        <span class="selection-count" id="selectionCount" data-i18n="auto.19"></span>
         <button class="btn primary small" id="btnSelectionCopy" type="button">
-          <svg><use href="#i-copy"/></svg><span>Копировать</span>
+          <svg><use href="#i-copy"/></svg><span data-i18n="auto.20"></span>
         </button>
       </div>
 
       <div class="overlay" id="noChat" hidden>
         <div class="empty-card">
           <div class="empty-logo"><img src="/static/icon.png" alt=""></div>
-          <h2 id="noChatTitle">Начните чат</h2>
-          <p id="noChatText">Напишите боту /start в Telegram — после этого переписка появится здесь.</p>
+          <h2 id="noChatTitle" data-i18n="auto.21"></h2>
+          <p id="noChatText" data-i18n="auto.22"></p>
           <div class="empty-actions">
             <button class="btn primary" id="btnNoChatFind" type="button">
-              <svg><use href="#i-user-plus"/></svg><span>Найти пользователя</span>
+              <svg><use href="#i-user-plus"/></svg><span data-i18n="auto.23"></span>
             </button>
             <button class="btn ghost" id="btnNoChatSettings" type="button">
-              <svg><use href="#i-gear"/></svg><span>Настройки</span>
+              <svg><use href="#i-gear"/></svg><span data-i18n="auto.7"></span>
             </button>
           </div>
           <div class="empty-app">telegram_chats_bot</div>
@@ -168,28 +168,28 @@
       <div class="overlay" id="chatEmpty" hidden>
         <div class="empty-card compact">
           <div class="empty-logo small"><img src="/static/icon.png" alt=""></div>
-          <h2>Начните чат</h2>
-          <p id="chatEmptyText">Напишите боту /start в Telegram — после этого переписка появится здесь.</p>
+          <h2 data-i18n="auto.21"></h2>
+          <p id="chatEmptyText" data-i18n="auto.22"></p>
           <div class="empty-actions">
-            <button class="btn ghost small" id="btnChatEmptyFind" type="button">Люди, писавшие боту</button>
+            <button class="btn ghost small" id="btnChatEmptyFind" type="button" data-i18n="auto.6"></button>
           </div>
         </div>
       </div>
 
       <div class="overlay loading-overlay" id="messagesLoading" hidden>
         <span class="spinner"></span>
-        <span>Загрузка сообщений…</span>
+        <span data-i18n="auto.24"></span>
       </div>
     </div>
 
     <footer class="composer" id="composerEl">
       <div class="attach-bar" id="attachBar" hidden></div>
       <div class="composer-box">
-        <button class="icon-btn attach" id="btnAttach" type="button" title="Прикрепить файл" aria-label="Прикрепить файл">
+        <button class="icon-btn attach" id="btnAttach" type="button" title="" aria-label="" data-i18n-title="auto.25" data-i18n-aria-label="auto.25">
           <svg><use href="#i-attach"/></svg>
         </button>
-        <textarea id="composerInput" rows="1" placeholder="Написать сообщение…" spellcheck="false" aria-label="Сообщение"></textarea>
-        <button class="send-btn" id="btnSend" type="button" title="Отправить (Enter)" aria-label="Отправить" disabled>
+        <textarea id="composerInput" rows="1" placeholder="" spellcheck="false" aria-label="" data-i18n-placeholder="auto.26" data-i18n-aria-label="auto.27"></textarea>
+        <button class="send-btn" id="btnSend" type="button" title="" aria-label="" disabled data-i18n-title="auto.28" data-i18n-aria-label="auto.29">
           <svg><use href="#i-plane"/></svg>
         </button>
       </div>
@@ -202,34 +202,34 @@
   <div class="modal-card settings-card" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" tabindex="-1">
     <header class="modal-head">
       <div class="modal-head-text">
-        <h2 id="settingsTitle">Настройки</h2>
+        <h2 id="settingsTitle" data-i18n="auto.7"></h2>
         <p class="modal-sub">telegram_chats_bot</p>
       </div>
-      <button class="icon-btn" type="button" data-close-modal aria-label="Закрыть настройки">
+      <button class="icon-btn" type="button" data-close-modal aria-label="" data-i18n-aria-label="auto.30">
         <svg><use href="#i-close"/></svg>
       </button>
     </header>
 
     <div class="settings-layout">
-      <nav class="settings-tabs" role="tablist" aria-label="Разделы настроек">
+      <nav class="settings-tabs" role="tablist" aria-label="" data-i18n-aria-label="auto.31">
         <button class="settings-tab active" type="button" role="tab" aria-selected="true" data-tab="theme">
-          <svg><use href="#i-sun"/></svg><span>Тема</span>
+          <svg><use href="#i-sun"/></svg><span data-i18n="auto.32"></span>
         </button>
         <button class="settings-tab" type="button" role="tab" aria-selected="false" data-tab="asr">
-          <svg><use href="#i-mic"/></svg><span>Расшифровка</span>
+          <svg><use href="#i-mic"/></svg><span data-i18n="auto.33"></span>
         </button>
         <button class="settings-tab" type="button" role="tab" aria-selected="false" data-tab="users">
-          <svg><use href="#i-users"/></svg><span>Пользователи</span>
+          <svg><use href="#i-users"/></svg><span data-i18n="auto.34"></span>
         </button>
         <button class="settings-tab" type="button" role="tab" aria-selected="false" data-tab="about">
-          <svg><use href="#i-info"/></svg><span>О приложении</span>
+          <svg><use href="#i-info"/></svg><span data-i18n="auto.35"></span>
         </button>
       </nav>
 
       <div class="settings-panes">
-        <section class="settings-pane active" data-pane="theme" role="tabpanel" aria-label="Тема">
+        <section class="settings-pane active" data-pane="theme" role="tabpanel" aria-label="" data-i18n-aria-label="auto.32">
           <div class="pane-head">
-            <h3>Тема оформления</h3>
+            <h3 data-i18n="auto.36"></h3>
           </div>
           <div class="theme-choice">
             <button class="theme-card" id="themeDark" type="button" data-theme-opt="dark">
@@ -243,7 +243,7 @@
                 </span>
               </span>
               <span class="theme-card-foot">
-                <span class="theme-card-text"><span class="theme-card-name">Тёмная</span></span>
+                <span class="theme-card-text"><span class="theme-card-name" data-i18n="auto.37"></span></span>
                 <span class="theme-check"><svg><use href="#i-check"/></svg></span>
               </span>
             </button>
@@ -258,21 +258,21 @@
                 </span>
               </span>
               <span class="theme-card-foot">
-                <span class="theme-card-text"><span class="theme-card-name">Светлая</span></span>
+                <span class="theme-card-text"><span class="theme-card-name" data-i18n="auto.38"></span></span>
                 <span class="theme-check"><svg><use href="#i-check"/></svg></span>
               </span>
             </button>
           </div>
         </section>
 
-        <section class="settings-pane" data-pane="asr" role="tabpanel" aria-label="Расшифровка">
+        <section class="settings-pane" data-pane="asr" role="tabpanel" aria-label="" data-i18n-aria-label="auto.33">
           <div class="pane-head">
-            <h3>Расшифровка речи</h3>
+            <h3 data-i18n="auto.39"></h3>
           </div>
 
           <label class="switch-row">
             <span class="switch-text">
-              <span class="switch-title">Расшифровка речи</span>
+              <span class="switch-title" data-i18n="auto.39"></span>
             </span>
             <input type="checkbox" class="switch-input" id="asrEnabled">
             <span class="switch" aria-hidden="true"></span>
@@ -281,39 +281,39 @@
           <div class="asr-config" id="asrConfig" hidden>
             <label class="switch-row">
               <span class="switch-text">
-                <span class="switch-title">Автоматическая расшифровка</span>
+                <span class="switch-title" data-i18n="auto.40"></span>
               </span>
               <input type="checkbox" class="switch-input" id="autoTranscribe">
               <span class="switch" aria-hidden="true"></span>
             </label>
 
             <div class="field">
-              <label class="field-label" for="asrModel">Модель распознавания</label>
+              <label class="field-label" for="asrModel" data-i18n="auto.41"></label>
               <select id="asrModel" class="input"></select>
               <div class="asr-line">
-                <div class="asr-status" id="asrStatus">Загрузка списка моделей…</div>
-                <button class="btn ghost small" id="btnAsrRefresh" type="button" title="Обновить список и статус">
-                  <svg><use href="#i-refresh"/></svg><span>Обновить</span>
+                <div class="asr-status" id="asrStatus" data-i18n="auto.42"></div>
+                <button class="btn ghost small" id="btnAsrRefresh" type="button" title="" data-i18n-title="auto.43">
+                  <svg><use href="#i-refresh"/></svg><span data-i18n="auto.44"></span>
                 </button>
               </div>
               <div class="progress" id="asrProgress" hidden><i id="asrProgressBar"></i></div>
               <div class="btn-row">
                 <button class="btn primary" id="btnAsrDownload" type="button">
-                  <svg><use href="#i-download"/></svg><span>Скачать</span>
+                  <svg><use href="#i-download"/></svg><span data-i18n="auto.45"></span>
                 </button>
               </div>
             </div>
           </div>
         </section>
 
-        <section class="settings-pane" data-pane="users" role="tabpanel" aria-label="Пользователи">
+        <section class="settings-pane" data-pane="users" role="tabpanel" aria-label="" data-i18n-aria-label="auto.34">
           <div class="pane-head">
-            <h3>Пользователи</h3>
+            <h3 data-i18n="auto.34"></h3>
           </div>
 
           <label class="switch-row">
             <span class="switch-text">
-              <span class="switch-title">Автоподтверждение новых пользователей</span>
+              <span class="switch-title" data-i18n="auto.46"></span>
             </span>
             <input type="checkbox" class="switch-input" id="autoApprove">
             <span class="switch" aria-hidden="true"></span>
@@ -321,7 +321,7 @@
 
           <details class="pending-block" id="pendingBlock" hidden>
             <summary>
-              <span>Ожидают подтверждения</span>
+              <span data-i18n="auto.47"></span>
               <span class="pending-count" id="pendingCount">0</span>
             </summary>
             <div class="settings-users" id="pendingUsers"></div>
@@ -330,35 +330,35 @@
           <div class="settings-users" id="settingsUsers"></div>
 
           <div class="field">
-            <label class="field-label" for="addUserInput">Добавить пользователя</label>
+            <label class="field-label" for="addUserInput" data-i18n="auto.48"></label>
             <div class="add-user-row">
-              <input class="input" id="addUserInput" type="text" placeholder="ID или @username" autocomplete="off" spellcheck="false">
+              <input class="input" id="addUserInput" type="text" placeholder="" autocomplete="off" spellcheck="false" data-i18n-placeholder="auto.49">
               <button class="btn primary" id="btnAddUser" type="button">
-                <svg><use href="#i-user-plus"/></svg><span>Добавить</span>
+                <svg><use href="#i-user-plus"/></svg><span data-i18n="auto.50"></span>
               </button>
             </div>
           </div>
         </section>
 
-        <section class="settings-pane" data-pane="about" role="tabpanel" aria-label="О приложении">
+        <section class="settings-pane" data-pane="about" role="tabpanel" aria-label="" data-i18n-aria-label="auto.35">
           <div class="pane-head">
-            <h3>О приложении</h3>
+            <h3 data-i18n="auto.35"></h3>
           </div>
 
           <div class="about-hero">
             <div class="about-logo"><img src="/static/icon.png" alt=""></div>
             <div>
               <div class="about-name">telegram_chats_bot</div>
-              <div class="about-sub">Локальный чат-интерфейс</div>
+              <div class="about-sub" data-i18n="auto.51"></div>
             </div>
           </div>
 
           <dl class="facts">
-            <div class="fact"><dt>Адрес API</dt><dd id="aboutApi">—</dd></div>
+            <div class="fact"><dt data-i18n="auto.52"></dt><dd id="aboutApi">—</dd></div>
             <div class="fact"><dt>Bot API</dt><dd id="aboutApiMode">—</dd></div>
-            <div class="fact"><dt>Лимит скачивания</dt><dd id="aboutDownload">—</dd></div>
-            <div class="fact"><dt>Лимит загрузки</dt><dd id="aboutUpload">—</dd></div>
-            <div class="fact" id="aboutAsrRow"><dt>Расшифровка</dt><dd id="aboutAsr">—</dd></div>
+            <div class="fact"><dt data-i18n="auto.53"></dt><dd id="aboutDownload">—</dd></div>
+            <div class="fact"><dt data-i18n="auto.54"></dt><dd id="aboutUpload">—</dd></div>
+            <div class="fact" id="aboutAsrRow"><dt data-i18n="auto.33"></dt><dd id="aboutAsr">—</dd></div>
           </dl>
         </section>
       </div>
@@ -371,9 +371,9 @@
   <div class="modal-card find-card" role="dialog" aria-modal="true" aria-labelledby="findTitle" tabindex="-1">
     <header class="modal-head">
       <div class="modal-head-text">
-        <h2 id="findTitle">Люди, писавшие боту</h2>
+        <h2 id="findTitle" data-i18n="auto.6"></h2>
       </div>
-      <button class="icon-btn" type="button" data-close-modal aria-label="Закрыть поиск">
+      <button class="icon-btn" type="button" data-close-modal aria-label="" data-i18n-aria-label="auto.55">
         <svg><use href="#i-close"/></svg>
       </button>
     </header>
@@ -381,8 +381,8 @@
     <div class="find-search">
       <div class="search-box">
         <svg class="search-ico" aria-hidden="true"><use href="#i-search"/></svg>
-        <input id="findSearch" type="text" placeholder="Имя, @username или ID" autocomplete="off" spellcheck="false" aria-label="Поиск пользователей">
-        <button class="search-clear" id="btnFindClear" type="button" aria-label="Очистить поиск" hidden>
+        <input id="findSearch" type="text" placeholder="" autocomplete="off" spellcheck="false" aria-label="" data-i18n-placeholder="auto.56" data-i18n-aria-label="auto.57">
+        <button class="search-clear" id="btnFindClear" type="button" aria-label="" hidden data-i18n-aria-label="auto.10">
           <svg><use href="#i-close"/></svg>
         </button>
       </div>
@@ -391,17 +391,17 @@
     <div class="find-list" id="findList"></div>
     <div class="find-empty" id="findEmpty" hidden>
       <div class="cle-icon"><svg><use href="#i-users"/></svg></div>
-      <div class="cle-title" id="findEmptyTitle">Никого не нашли</div>
-      <div class="cle-text" id="findEmptyText">Напишите боту /start в Telegram — пользователь появится в этом списке.</div>
+      <div class="cle-title" id="findEmptyTitle" data-i18n="auto.58"></div>
+      <div class="cle-text" id="findEmptyText" data-i18n="auto.59"></div>
     </div>
   </div>
 </div>
 
-<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="Просмотр медиа">
-  <button class="lb-close" id="lightboxClose" type="button" aria-label="Закрыть">
+<div class="lightbox" id="lightbox" hidden role="dialog" aria-modal="true" aria-label="" data-i18n-aria-label="auto.60">
+  <button class="lb-close" id="lightboxClose" type="button" aria-label="" data-i18n-aria-label="auto.61">
     <svg><use href="#i-close"/></svg>
   </button>
-  <img id="lightboxImg" alt="Изображение">
+  <img id="lightboxImg" alt="" data-i18n-alt="auto.152">
   <video id="lightboxVideo" controls autoplay loop playsinline hidden></video>
 </div>
 
@@ -410,32 +410,32 @@
   <div class="yt-card">
     <div class="yt-head">
       <span>YouTube</span>
-      <button class="icon-btn" id="ytClose" type="button" aria-label="Закрыть">
+      <button class="icon-btn" id="ytClose" type="button" aria-label="" data-i18n-aria-label="auto.61">
         <svg><use href="#i-close"/></svg>
       </button>
     </div>
     <div class="yt-frame">
       <iframe id="ytFrame" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
     </div>
-    <a class="yt-open" id="ytOpen" href="#" target="_blank" rel="noopener">Открыть на YouTube</a>
+    <a class="yt-open" id="ytOpen" href="#" target="_blank" rel="noopener" data-i18n="auto.62"></a>
   </div>
 </div>
 
 <div class="dropzone" id="dropzone" aria-hidden="true">
   <div class="dropzone-inner">
     <svg><use href="#i-upload"/></svg>
-    <strong>Отпустите файлы</strong>
-    <span>Они прикрепятся к сообщению</span>
+    <strong data-i18n="auto.63"></strong>
+    <span data-i18n="auto.64"></span>
   </div>
 </div>
 
 <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
 
 <div class="ctx-menu" id="ctxMenu" hidden>
-  <button type="button" data-ctx="copy">Копировать текст</button>
-  <button type="button" data-ctx="copy-image">Копировать изображение</button>
-  <button type="button" data-ctx="select">Выбрать</button>
-  <button type="button" data-ctx="download">Скачать</button>
+  <button type="button" data-ctx="copy" data-i18n="auto.65"></button>
+  <button type="button" data-ctx="copy-image" data-i18n="auto.66"></button>
+  <button type="button" data-ctx="select" data-i18n="auto.67"></button>
+  <button type="button" data-ctx="download" data-i18n="auto.45"></button>
 </div>
 
 <input type="file" id="fileInput" multiple hidden>
