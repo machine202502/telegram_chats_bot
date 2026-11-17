@@ -19,7 +19,6 @@ from ctypes import wintypes
 from pathlib import Path
 
 from PIL import Image
-
 ROOT = Path(__file__).resolve().parent.parent
 ICON_ICO = ROOT / "webui" / "icon.ico"
 ICON_PNG = ROOT / "webui" / "icon.png"
@@ -221,6 +220,40 @@ def main() -> int:
 
     import webview
 
+    class Bridge:
+        """JS -> Python: сохранение файла через нативный диалог WebView2."""
+
+        def save_media(self, msg_id, suggested_name=""):
+            try:
+                numeric = int(str(msg_id))
+            except (TypeError, ValueError):
+                return {"ok": False, "error": "Неверный id файла"}
+            name = Path(str(suggested_name or f"telegram-{numeric}")).name
+            window = webview.windows[0] if webview.windows else None
+            if window is None:
+                return {"ok": False, "error": "Окно не готово"}
+            try:
+                selected = window.create_file_dialog(
+                    webview.SAVE_DIALOG,
+                    save_filename=name,
+                    file_types=("Все файлы (*.*)",),
+                )
+            except Exception as exc:
+                log.exception("Диалог сохранения")
+                return {"ok": False, "error": str(exc)}
+            if not selected:
+                return {"ok": False, "cancelled": True}
+            target = selected[0] if isinstance(selected, (list, tuple)) else str(selected)
+            try:
+                urllib.request.urlretrieve(
+                    f"{URL}/media/{numeric}?download=1",
+                    target,
+                )
+            except Exception as exc:
+                log.exception("Скачивание файла")
+                return {"ok": False, "error": f"Не удалось скачать файл: {exc}"}
+            return {"ok": True, "path": target}
+
     tray = TrayApp(webview)
     window = webview.create_window(
         TITLE,
@@ -229,6 +262,7 @@ def main() -> int:
         height=840,
         min_size=(900, 600),
         text_select=True,
+        js_api=Bridge(),
     )
     tray.attach(window)
 
@@ -236,6 +270,13 @@ def main() -> int:
         time.sleep(0.8)
         set_window_icon()
         tray.run_tray()
+        try:
+            bridge_ok = window.evaluate_js(
+                "!!(window.pywebview && window.pywebview.api && window.pywebview.api.save_media)"
+            )
+            log.info("Мост сохранения файлов: %s", bridge_ok)
+        except Exception as exc:
+            log.exception("Проверка моста: %s", exc)
         # pywebview иногда пересоздаёт HWND после старта — повторяем иконку.
         for _ in range(4):
             time.sleep(0.7)

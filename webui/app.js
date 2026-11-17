@@ -64,6 +64,9 @@
     asrActive: '',
     asrLoading: false,
     asrError: '',
+    selectionMode: false,
+    selected: new Set(),
+    contextMsg: null,
     asrTimer: null,
     findUsers: [],
     findLoading: false,
@@ -156,6 +159,11 @@
     lightbox: $('#lightbox'),
     lightboxImg: $('#lightboxImg'),
     lightboxDownload: $('#lightboxDownload'),
+    selectionBar: $('#selectionBar'),
+    selectionCount: $('#selectionCount'),
+    btnSelectionClose: $('#btnSelectionClose'),
+    btnSelectionCopy: $('#btnSelectionCopy'),
+    ctxMenu: $('#ctxMenu'),
     lightboxClose: $('#lightboxClose'),
     toasts: $('#toasts'),
     dropzone: $('#dropzone')
@@ -704,6 +712,7 @@
 
     saveDraft();
     state.activeId = chatId;
+    setSelectionMode(false);
     chat.unread = 0;
     state.messages.clear();
     state.rev = 0;
@@ -1304,6 +1313,7 @@
     });
     initAudioPlayers(ui.feed);
     refreshGrouping();
+    applySelectionState();
     updateLoadOlder();
     updateOverlays();
   }
@@ -1331,6 +1341,7 @@
     ui.feed.appendChild(row);
     initAudioPlayers(row);
     refreshGrouping();
+    applySelectionState();
     updateLoadOlder();
     updateOverlays();
     return true;
@@ -2434,6 +2445,154 @@
     });
   }
 
+  /* ------------------------------------------------ выбор и контекстное меню */
+  function messageTextForCopy(msg) {
+    return [msg.text, msg.caption, msg.transcript]
+      .map((part) => String(part || '').trim())
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  function isImageMessage(msg) {
+    if (!msg) return false;
+    const media = msg.media || {};
+    return msg.kind === 'photo' || msg.kind === 'sticker' ||
+      (media.mime_type || '').indexOf('image/') === 0;
+  }
+
+  function downloadName(msg) {
+    const media = msg.media || {};
+    if (media.file_name) return String(media.file_name);
+    const ext = { photo: '.jpg', video: '.mp4', voice: '.mp3', audio: '.mp3', document: '' }[msg.kind] || '';
+    return 'telegram-' + msg.id + ext;
+  }
+
+  async function saveViaBridge(msg) {
+    if (!(window.pywebview && window.pywebview.api && window.pywebview.api.save_media)) {
+      return false;
+    }
+    try {
+      const result = await window.pywebview.api.save_media(String(msg.id), downloadName(msg));
+      if (result && result.ok) {
+        toast('Сохранено: ' + result.path, 'success');
+        return true;
+      }
+      if (result && result.cancelled) return true;
+      if (result && result.error) {
+        toast(result.error, 'error');
+        return false;
+      }
+      return false;
+    } catch (err) {
+      toast('Не удалось сохранить файл: ' + err.message, 'error');
+      return true;
+    }
+  }
+
+  async function triggerDownload(msg) {
+    if (await saveViaBridge(msg)) return;
+    const a = document.createElement('a');
+    a.href = mediaDownloadUrl(msg.id);
+    a.download = downloadName(msg);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  async function copyImage(msg) {
+    if (!isImageMessage(msg)) return;
+    try {
+      const response = await fetch(mediaSrc(msg));
+      if (!response.ok) throw new Error('файл не найден');
+      const blob = await response.blob();
+      const bitmap = await createImageBitmap(blob);
+      const canvas = document.createElement('canvas');
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      canvas.getContext('2d').drawImage(bitmap, 0, 0);
+      const png = await new Promise((resolve, reject) => {
+        canvas.toBlob((result) => result ? resolve(result) : reject(new Error('не удалось преобразовать')), 'image/png');
+      });
+      if (!navigator.clipboard || !window.ClipboardItem) throw new Error('буфер не поддерживает изображения');
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': png })]);
+      toast('Изображение скопировано', 'success');
+    } catch (err) {
+      toast('Не удалось скопировать изображение. Сохраните его кнопкой скачивания.', 'error');
+    }
+  }
+
+  function applySelectionState() {
+    $$('.row', ui.feed).forEach((row) => {
+      row.classList.toggle('selected', state.selected.has(Number(row.dataset.id)));
+    });
+    if (ui.selectionCount) {
+      ui.selectionCount.textContent = 'Выбрано ' + state.selected.size;
+    }
+  }
+
+  function setSelectionMode(enabled) {
+    state.selectionMode = !!enabled;
+    if (!enabled) state.selected.clear();
+    if (ui.messages) ui.messages.classList.toggle('selection-mode', state.selectionMode);
+    if (ui.selectionBar) ui.selectionBar.hidden = !state.selectionMode;
+    applySelectionState();
+  }
+
+  function toggleSelection(id) {
+    const numeric = Number(id);
+    if (!numeric) return;
+    if (state.selected.has(numeric)) state.selected.delete(numeric);
+    else state.selected.add(numeric);
+    applySelectionState();
+  }
+
+  async function copySelectedMessages() {
+    const messages = sortedMessages().filter((msg) => state.selected.has(Number(msg.id)));
+    if (!messages.length) {
+      toast('Ничего не выбрано', 'error');
+      return;
+    }
+    const text = messages.map(messageTextForCopy).filter(Boolean).join('\n\n');
+    if (text) {
+      try {
+        await copyText(text);
+        toast('Скопировано сообщений: ' + messages.length, 'success');
+        setSelectionMode(false);
+      } catch (err) {
+        toast('Не удалось скопировать: ' + err.message, 'error');
+      }
+      return;
+    }
+    if (messages.length === 1 && isImageMessage(messages[0])) {
+      await copyImage(messages[0]);
+      return;
+    }
+    toast('В выбранных сообщениях нет текста', 'error');
+  }
+
+  function hideContextMenu() {
+    if (ui.ctxMenu) ui.ctxMenu.hidden = true;
+    state.contextMsg = null;
+  }
+
+  function openContextMenu(clientX, clientY, msg) {
+    if (!ui.ctxMenu) return;
+    state.contextMsg = msg;
+    const hasText = !!messageTextForCopy(msg);
+    const canImage = isImageMessage(msg) && !!msg.local;
+    const canDownload = !!msg.local;
+    $$('button', ui.ctxMenu).forEach((button) => {
+      const action = button.dataset.ctx;
+      button.hidden = (action === 'copy' && !hasText) ||
+        (action === 'copy-image' && !canImage) ||
+        (action === 'download' && !canDownload);
+    });
+    ui.ctxMenu.hidden = false;
+    const rect = ui.ctxMenu.getBoundingClientRect();
+    ui.ctxMenu.style.left = Math.max(8, Math.min(clientX, window.innerWidth - rect.width - 8)) + 'px';
+    ui.ctxMenu.style.top = Math.max(8, Math.min(clientY, window.innerHeight - rect.height - 8)) + 'px';
+  }
+
   /* ------------------------------------------------------------------ события */
   function bindEvents() {
     ui.conn.addEventListener('click', () => {
@@ -2606,6 +2765,102 @@
           wrapSelection('*');
         }
       }
+    });
+
+    if (ui.btnSelectionClose) {
+      ui.btnSelectionClose.addEventListener('click', () => setSelectionMode(false));
+    }
+    if (ui.btnSelectionCopy) {
+      ui.btnSelectionCopy.addEventListener('click', copySelectedMessages);
+    }
+
+    if (ui.ctxMenu) {
+      ui.ctxMenu.addEventListener('click', async (event) => {
+        const button = event.target.closest('button[data-ctx]');
+        if (!button || !state.contextMsg) return;
+        const msg = state.contextMsg;
+        const action = button.dataset.ctx;
+        hideContextMenu();
+        if (action === 'copy') {
+          try { await copyText(messageTextForCopy(msg)); toast('Скопировано', 'success'); }
+          catch (err) { toast('Не удалось скопировать: ' + err.message, 'error'); }
+        } else if (action === 'copy-image') {
+          copyImage(msg);
+        } else if (action === 'select') {
+          setSelectionMode(true);
+          toggleSelection(msg.id);
+        } else if (action === 'download') {
+          triggerDownload(msg);
+        }
+      });
+    }
+
+    ui.feed.addEventListener('contextmenu', (event) => {
+      const row = event.target.closest('.row');
+      if (!row) return;
+      const msg = state.messages.get(Number(row.dataset.id));
+      if (!msg) return;
+      event.preventDefault();
+      openContextMenu(event.clientX, event.clientY, msg);
+    });
+
+    ui.feed.addEventListener('click', (event) => {
+      if (!state.selectionMode) return;
+      const row = event.target.closest('.row');
+      if (!row) return;
+      event.preventDefault();
+      event.stopPropagation();
+      toggleSelection(row.dataset.id);
+    }, true);
+
+    let pressTimer = null;
+    let pressStart = null;
+    ui.feed.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0 || state.selectionMode) return;
+      const row = event.target.closest('.row');
+      if (!row || event.target.closest('a, button, video, audio, input, textarea')) return;
+      pressStart = { x: event.clientX, y: event.clientY, id: Number(row.dataset.id) };
+      pressTimer = setTimeout(() => {
+        pressTimer = null;
+        if (!pressStart) return;
+        setSelectionMode(true);
+        toggleSelection(pressStart.id);
+        pressStart = null;
+      }, 550);
+    });
+    const cancelPress = () => {
+      if (pressTimer) clearTimeout(pressTimer);
+      pressTimer = null;
+      pressStart = null;
+    };
+    ui.feed.addEventListener('pointerup', cancelPress);
+    ui.feed.addEventListener('pointercancel', cancelPress);
+    ui.feed.addEventListener('pointermove', (event) => {
+      if (!pressStart) return;
+      if (Math.abs(event.clientX - pressStart.x) > 8 || Math.abs(event.clientY - pressStart.y) > 8) {
+        cancelPress();
+      }
+    });
+
+    document.addEventListener('click', (event) => {
+      if (ui.ctxMenu && !ui.ctxMenu.hidden && !event.target.closest('#ctxMenu')) hideContextMenu();
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        if (ui.ctxMenu && !ui.ctxMenu.hidden) { hideContextMenu(); return; }
+        if (state.selectionMode) setSelectionMode(false);
+      }
+    });
+
+    document.addEventListener('click', async (event) => {
+      const link = event.target.closest('a[download]');
+      if (!link || !(window.pywebview && window.pywebview.api && window.pywebview.api.save_media)) return;
+      const match = (link.getAttribute('href') || '').match(/\/media\/(\d+)/);
+      if (!match) return;
+      const msg = state.messages.get(Number(match[1]));
+      if (!msg) return;
+      event.preventDefault();
+      triggerDownload(msg);
     });
 
     document.addEventListener('paste', (event) => {

@@ -6,6 +6,101 @@
   const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ESC[c]);
   const SAFE_URL = /^(https?:\/\/|tg:\/\/|mailto:)/i;
 
+  const KEYWORDS = {
+    sql: new Set(('select from where and or not null is in like between join left right inner outer ' +
+      'full on as group by order having limit offset insert into values update set delete create table ' +
+      'drop alter add column primary key foreign references unique index view distinct union all case ' +
+      'when then else end exists asc desc count sum avg min max coalesce cast return').split(' ')),
+    python: new Set(('def class return if elif else for while in not and or is None True False import ' +
+      'from as try except finally with lambda pass break continue raise yield global nonlocal assert ' +
+      'del async await yield match case').split(' ')),
+    js: new Set(('const let var function return if else for while do switch case break continue new ' +
+      'class extends super this typeof instanceof in of try catch finally throw async await import ' +
+      'export from default null undefined true false').split(' ')),
+    ts: new Set(('const let var function return if else for while switch case break continue new class ' +
+      'extends implements interface type enum public private protected readonly async await import ' +
+      'export from default null undefined true false as satisfies').split(' ')),
+    json: new Set(('true false null').split(' ')),
+    bash: new Set(('if then else elif fi for while do done case esac function in return exit echo cd ' +
+      'export source alias sudo docker compose git npm pnpm yarn python pip').split(' ')),
+    css: new Set(('important media supports keyframes from to').split(' ')),
+    generic: new Set(('true false null none undefined return if else for while function class const ' +
+      'let var new import export').split(' ')),
+  };
+
+  function highlight(code, language) {
+    const lang = String(language || '').toLowerCase().split(/\s+/)[0];
+    const key = ({ py: 'python', python3: 'python', js: 'js', javascript: 'js', ts: 'ts',
+      typescript: 'ts', sh: 'bash', shell: 'bash', zsh: 'bash', console: 'bash',
+      postgres: 'sql', postgresql: 'sql', mysql: 'sql', sqlite: 'sql' })[lang] || lang;
+    const words = KEYWORDS[key] || KEYWORDS.generic;
+    const lineComment = key === 'sql' ? '--' : (key === 'python' || key === 'bash' || key === 'yaml') ? '#' : '//';
+    const blockComment = key === 'html' ? ['<!--', '-->'] : ['/*', '*/'];
+    const src = String(code == null ? '' : code);
+    let html = '';
+    let i = 0;
+
+    const span = (cls, text) => '<span class="tok-' + cls + '">' + esc(text) + '</span>';
+
+    while (i < src.length) {
+      const rest = src.slice(i);
+      if (rest.startsWith(lineComment)) {
+        const end = rest.indexOf('\n');
+        const text = end === -1 ? rest : rest.slice(0, end);
+        html += span('com', text);
+        i += text.length;
+        continue;
+      }
+      if (rest.startsWith(blockComment[0])) {
+        const end = rest.indexOf(blockComment[1], blockComment[0].length);
+        const text = end === -1 ? rest : rest.slice(0, end + blockComment[1].length);
+        html += span('com', text);
+        i += text.length;
+        continue;
+      }
+      const ch = src[i];
+      if (ch === '"' || ch === "'" || ch === '`') {
+        let j = i + 1;
+        while (j < src.length) {
+          if (src[j] === '\\') { j += 2; continue; }
+          if (src[j] === ch) { j += 1; break; }
+          if (ch !== '`' && src[j] === '\n') break;
+          j += 1;
+        }
+        html += span('str', src.slice(i, j));
+        i = j;
+        continue;
+      }
+      if (/[0-9]/.test(ch) && (i === 0 || /[\s([{,:=+\-*/<>!&|]/.test(src[i - 1]))) {
+        let j = i + 1;
+        while (j < src.length && /[0-9a-fA-FxX._]/.test(src[j])) j += 1;
+        html += span('num', src.slice(i, j));
+        i = j;
+        continue;
+      }
+      if (/[A-Za-z_$@]/.test(ch)) {
+        let j = i + 1;
+        while (j < src.length && /[A-Za-z0-9_$]/.test(src[j])) j += 1;
+        const word = src.slice(i, j);
+        const lower = word.toLowerCase();
+        let k = j;
+        while (k < src.length && /\s/.test(src[k])) k += 1;
+        if (words.has(lower) || words.has(word)) {
+          html += span('kw', word);
+        } else if (src[k] === '(') {
+          html += span('fn', word);
+        } else {
+          html += esc(word);
+        }
+        i = j;
+        continue;
+      }
+      html += esc(ch);
+      i += 1;
+    }
+    return html;
+  }
+
   function render(markdown) {
     const src = String(markdown == null ? '' : markdown).replace(/\r\n?/g, '\n');
     const stash = [];
@@ -105,7 +200,7 @@
         out.push(
           '<div class="md-pre"' + cls + '>' +
             '<button class="md-copy" type="button" title="Скопировать код">⧉</button>' +
-            '<pre><code>' + esc(item.code) + '</code></pre>' +
+            '<pre><code>' + highlight(item.code, item.lang) + '</code></pre>' +
           '</div>'
         );
         continue;

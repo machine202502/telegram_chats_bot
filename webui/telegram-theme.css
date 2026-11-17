@@ -1344,3 +1344,86 @@ body.resizing .sidebar-resizer::after {
   background: var(--accent);
   opacity: 1;
 }
+
+/* Подсветка синтаксиса в блоках кода. */
+.md-pre .tok-kw { color: #c792ea; }
+.md-pre .tok-str { color: #9ece6a; }
+.md-pre .tok-num { color: #ff9e64; }
+.md-pre .tok-com { color: #7f8c9a; font-style: italic; }
+.md-pre .tok-fn { color: #7dcfff; }
+body.theme-light .md-pre .tok-kw { color: #a626a4; }
+body.theme-light .md-pre .tok-str { color: #2e7d32; }
+body.theme-light .md-pre .tok-num { color: #b45309; }
+body.theme-light .md-pre .tok-com { color: #8a8f98; }
+body.theme-light .md-pre .tok-fn { color: #1d6fb8; }
+
+/* Выделение нескольких сообщений и контекстное меню. */
+.messages.selection-mode .row {
+  position: relative;
+  padding-left: 30px;
+  cursor: pointer;
+}
+.messages.selection-mode .row::before {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  width: 19px;
+  height: 19px;
+  margin-top: -10px;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+  background: var(--panel);
+  box-sizing: border-box;
+}
+.messages.selection-mode .row.selected::before {
+  content: "✓";
+  display: grid;
+  place-items: center;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+}
+.messages.selection-mode .row.selected .bubble {
+  box-shadow: 0 0 0 2px var(--accent), 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.selection-bar {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px 6px 6px;
+  border-radius: 14px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  white-space: nowrap;
+}
+.selection-count { font-size: 13px; color: var(--text); }
+.ctx-menu {
+  position: fixed;
+  z-index: 400;
+  min-width: 205px;
+  padding: 5px;
+  border-radius: 11px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.ctx-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 7px;
+  text-align: left;
+  font-size: 13.5px;
+  color: var(--text);
+}
+.ctx-menu button:hover { background: var(--hover); }
+.ctx-menu button[disabled] { display: none; }
