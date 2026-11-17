@@ -68,6 +68,7 @@
     selected: new Set(),
     contextMsg: null,
     ensuring: new Set(),
+    linkPreviews: new Map(),
     asrTimer: null,
     findUsers: [],
     findLoading: false,
@@ -166,6 +167,10 @@
     btnSelectionClose: $('#btnSelectionClose'),
     btnSelectionCopy: $('#btnSelectionCopy'),
     ctxMenu: $('#ctxMenu'),
+    ytModal: $('#ytModal'),
+    ytFrame: $('#ytFrame'),
+    ytOpen: $('#ytOpen'),
+    ytClose: $('#ytClose'),
     lightboxClose: $('#lightboxClose'),
     toasts: $('#toasts'),
     dropzone: $('#dropzone')
@@ -1140,6 +1145,106 @@
     return '<span class="tick" title="Отправлено">' + icon('check') + '</span>';
   }
 
+  function firstLink(text) {
+    const cleaned = String(text || '')
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/`[^`]*`/g, ' ');
+    const found = cleaned.match(/https?:\/\/[^\s<>"']+/i);
+    if (!found) return '';
+    return found[0].replace(/[.,;:!?)\]]+$/g, '');
+  }
+
+  function loadLinkPreview(url) {
+    if (state.linkPreviews.has(url)) return state.linkPreviews.get(url);
+    const pending = api('/api/link_preview?url=' + encodeURIComponent(url))
+      .then((data) => (data && data.ok ? data.preview : null))
+      .catch(() => null);
+    state.linkPreviews.set(url, pending);
+    return pending;
+  }
+
+  function createLinkPreview(url) {
+    const card = document.createElement('div');
+    card.className = 'link-preview loading';
+    card.dataset.url = url;
+    card.innerHTML = '<div class="lp-loading"><span class="spinner"></span><span>Загрузка превью…</span></div>';
+
+    card.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const data = card._preview;
+      if (data && data.type === 'youtube') {
+        openYoutube(data);
+      } else {
+        openExternalUrl(card.dataset.url);
+      }
+    });
+
+    loadLinkPreview(url).then((data) => {
+      if (!data) {
+        let domain = '';
+        try { domain = new URL(url).hostname.replace(/^www\./, ''); } catch (_err) { /* ignore */ }
+        card.classList.remove('loading');
+        card.innerHTML = '<div class="lp-body">' +
+          (domain ? '<div class="lp-site">' + esc(domain) + '</div>' : '') +
+          '<div class="lp-title">' + esc(domain || url) + '</div>' +
+          '</div>';
+        return;
+      }
+      card._preview = data;
+      card.classList.remove('loading');
+      card.dataset.url = data.url || url;
+      const site = data.site_name || (() => {
+        try { return new URL(data.url || url).hostname.replace(/^www\./, ''); }
+        catch (_err) { return ''; }
+      })();
+      let html = '';
+      if (data.image) {
+        if (data.type === 'youtube') {
+          html += '<div class="lp-thumb"><img class="lp-image" src="' + esc(data.image) +
+            '" alt="" loading="lazy"><span class="lp-play-btn">▶</span></div>';
+        } else {
+          html += '<img class="lp-image" src="' + esc(data.image) + '" alt="" loading="lazy">';
+        }
+      }
+      html += '<div class="lp-body">' +
+        (site ? '<div class="lp-site">' + esc(site) + '</div>' : '') +
+        '<div class="lp-title">' + esc(data.title || site || 'Ссылка') + '</div>' +
+        (data.description ? '<div class="lp-desc">' + esc(data.description) + '</div>' : '') +
+        '</div>';
+      card.innerHTML = html;
+      const image = $('.lp-image', card);
+      if (image) image.addEventListener('error', () => image.remove());
+    });
+    return card;
+  }
+
+  function openExternalUrl(url) {
+    if (!url) return;
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.open_url) {
+      try { window.pywebview.api.open_url(url); return; } catch (_err) { /* fallback */ }
+    }
+    window.open(url, '_blank', 'noopener');
+  }
+
+  function openYoutube(data) {
+    if (!data || !ui.ytModal) return;
+    const id = data.video_id || '';
+    if (!id) return;
+    ui.ytFrame.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) +
+      '?autoplay=1&rel=0';
+    ui.ytOpen.href = data.url || ('https://www.youtube.com/watch?v=' + id);
+    ui.ytModal.hidden = false;
+    document.body.classList.add('modal-open');
+  }
+
+  function closeYoutube() {
+    if (!ui.ytModal) return;
+    ui.ytModal.hidden = true;
+    if (ui.ytFrame) ui.ytFrame.src = 'about:blank';
+    document.body.classList.remove('modal-open');
+  }
+
   function buildRow(msg) {
     const row = document.createElement('div');
     row.className = 'row ' + (msg.dir === 'out' ? 'out' : 'in');
@@ -1185,6 +1290,11 @@
       body.className = 'body';
       body.textContent = '—';
       bubble.appendChild(body);
+    }
+
+    if (content && !msg.temp) {
+      const previewUrl = firstLink(content);
+      if (previewUrl) bubble.appendChild(createLinkPreview(previewUrl));
     }
 
     const transcript = buildTranscript(msg);
@@ -2900,6 +3010,7 @@
     window.addEventListener('resize', hideContextMenu);
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
+        if (ui.ytModal && !ui.ytModal.hidden) { closeYoutube(); return; }
         if (ui.ctxMenu && !ui.ctxMenu.hidden) { hideContextMenu(); return; }
         if (state.selectionMode) setSelectionMode(false);
       }
@@ -3071,6 +3182,13 @@
     });
 
     /* лайтбокс */
+    if (ui.ytClose) ui.ytClose.addEventListener('click', closeYoutube);
+    if (ui.ytModal) {
+      ui.ytModal.addEventListener('click', (event) => {
+        if (event.target.closest('[data-close-yt]')) closeYoutube();
+      });
+    }
+
     ui.lightbox.addEventListener('click', (event) => {
       const target = event.target;
       if (target.closest('.lb-close, .lb-download, video')) return;

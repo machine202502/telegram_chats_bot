@@ -15,6 +15,7 @@ import sys
 import threading
 import time
 import urllib.request
+import webbrowser
 from ctypes import wintypes
 from pathlib import Path
 
@@ -222,6 +223,17 @@ def main() -> int:
 
     class Bridge:
         """JS -> Python: сохранение файла через нативный диалог WebView2."""
+
+        def open_url(self, url):
+            value = str(url or "")
+            if not value.startswith(("http://", "https://")):
+                return {"ok": False, "error": "Некорректная ссылка"}
+            try:
+                webbrowser.open(value)
+                return {"ok": True}
+            except Exception as exc:
+                log.exception("open_url")
+                return {"ok": False, "error": str(exc)}
 
         def save_media(self, msg_id, suggested_name=""):
             try:

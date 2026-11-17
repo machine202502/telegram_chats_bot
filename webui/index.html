@@ -397,6 +397,22 @@
   <video id="lightboxVideo" controls autoplay loop playsinline hidden></video>
 </div>
 
+<div class="yt-modal" id="ytModal" hidden role="dialog" aria-modal="true" aria-label="YouTube">
+  <div class="yt-backdrop" data-close-yt></div>
+  <div class="yt-card">
+    <div class="yt-head">
+      <span>YouTube</span>
+      <button class="icon-btn" id="ytClose" type="button" aria-label="Закрыть">
+        <svg><use href="#i-close"/></svg>
+      </button>
+    </div>
+    <div class="yt-frame">
+      <iframe id="ytFrame" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <a class="yt-open" id="ytOpen" href="#" target="_blank" rel="noopener">Открыть на YouTube</a>
+  </div>
+</div>
+
 <div class="dropzone" id="dropzone" aria-hidden="true">
   <div class="dropzone-inner">
     <svg><use href="#i-upload"/></svg>

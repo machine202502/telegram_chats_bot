@@ -15,6 +15,7 @@ from werkzeug.exceptions import HTTPException
 from PIL import Image, ImageDraw
 
 import agent_api
+import linkpreview
 from webapp import KIND_LABELS, WebApp
 
 log = logging.getLogger(__name__)
@@ -362,6 +363,20 @@ def create_flask(app: WebApp) -> Flask:
         except Exception as exc:
             raise ApiError(str(exc), 400)
         return jsonify({"ok": True})
+
+    @flask_app.get("/api/link_preview")
+    def link_preview():
+        url = (request.args.get("url") or "").strip()
+        if not url:
+            raise ApiError("Не указана ссылка")
+        try:
+            preview = linkpreview.fetch_preview(url)
+        except linkpreview.PreviewError as exc:
+            return jsonify({"ok": False, "error": str(exc)}), 200
+        except Exception as exc:
+            log.info("link_preview %s: %s", url, exc)
+            return jsonify({"ok": False, "error": "Не удалось получить превью"}), 200
+        return jsonify({"ok": True, "preview": preview})
 
     @flask_app.get("/api/avatar/<int:user_id>")
     def avatar(user_id: int):
