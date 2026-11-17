@@ -205,7 +205,7 @@ def create_flask(app: WebApp) -> Flask:
             raise ApiError(str(exc), 404)
         except Exception as exc:
             log.exception("add_chat")
-            raise ApiError(f"Не удалось добавить: {exc}", 502)
+            raise ApiError(tr('backend.205', error=exc), 502)
         if not chat:
             raise ApiError(tr('backend.95'), 502)
         return jsonify({"ok": True, "chat": _chat_json(app, chat)})

@@ -69,8 +69,7 @@ def resolve_chat(tg: Telegram, query: str, known_users: list[dict[str, Any]] | N
                 }
 
     raise ValueError(
-        f"Пользователь не найден ({last_error or tr('backend.117')}). "
-        "Он должен хотя бы раз написать боту /start."
+        tr('backend.211', error=last_error or tr('backend.117')) + ' ' + tr('backend.212')
     )
 
 

@@ -561,8 +561,7 @@ class WebApp:
         if size and size > self.download_limit:
             self.store.patch(
                 msg_id, chat_id,
-                error=f"Файл {size / 1024 / 1024:.1f} МБ больше лимита "
-                      f"{self.download_limit / 1024 / 1024:.0f} МБ",
+                error=tr('backend.204', size=f"{size / 1024 / 1024:.1f}", limit=f"{self.download_limit / 1024 / 1024:.0f}"),
             )
             return
         ext = Path(path).suffix.lower() or Path(job.get("name") or "").suffix.lower()

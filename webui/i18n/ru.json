@@ -382,5 +382,18 @@
   "backend.145": "Модель %s не скачана (%s), ищу готовую",
   "backend.146": "Модель %s не скачана, ищу готовую",
   "backend.147": "Аудио %s тише порога, возвращаю пустой текст",
-  "backend.148": "Не установлен soundfile. Установите: pip install soundfile"
+  "backend.148": "Не установлен soundfile. Установите: pip install soundfile",
+  "backend.200": "Некорректный JSON: {error}",
+  "backend.201": "Внутренняя ошибка: {error}",
+  "backend.202": "Некорректный base64: {error}",
+  "backend.203": "Не удалось скачать файл: {error}",
+  "backend.204": "Файл {size} МБ больше лимита {limit} МБ",
+  "backend.205": "Не удалось добавить: {error}",
+  "backend.206": "Telegram ограничил частоту запросов, подождите {seconds} с.",
+  "backend.207": "Нет связи с Telegram: {error}",
+  "backend.208": "Telegram вернул не JSON (HTTP {status})",
+  "backend.209": "Не удалось скачать файл (HTTP {status})",
+  "backend.210": "Файл больше лимита скачивания ({limit} МБ)",
+  "backend.211": "Пользователь не найден ({error}). Он должен хотя бы раз написать боту /start.",
+  "backend.212": "Он должен хотя бы раз написать боту /start."
 }

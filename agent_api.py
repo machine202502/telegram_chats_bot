@@ -200,7 +200,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 data = json.loads(body.decode("utf-8"))
             except (UnicodeDecodeError, ValueError) as exc:
-                raise AgentError(f"Некорректный JSON: {exc}") from exc
+                raise AgentError(tr('backend.200', error=exc)) from exc
             if not isinstance(data, dict):
                 raise AgentError(tr('backend.6'))
             return data
@@ -291,7 +291,7 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": exc.message}, exc.status)
         except Exception as exc:  # pragma: no cover
             log.exception("API GET %s", path)
-            self._json({"ok": False, "error": f"Внутренняя ошибка: {exc}"}, 500)
+            self._json({"ok": False, "error": tr("backend.201", error=exc)}, 500)
 
     def do_POST(self) -> None:  # noqa: N802
         parsed = urlparse(self.path)
@@ -316,7 +316,7 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"ok": False, "error": exc.message}, exc.status)
         except Exception as exc:  # pragma: no cover
             log.exception("API POST %s", path)
-            self._json({"ok": False, "error": f"Внутренняя ошибка: {exc}"}, 500)
+            self._json({"ok": False, "error": tr("backend.201", error=exc)}, 500)
 
     # ------------------------------------------------------------------ action
     def _add_user(self, body: bytes) -> None:
@@ -412,7 +412,7 @@ class Handler(BaseHTTPRequestHandler):
                 try:
                     blob = base64.b64decode(str(raw), validate=False)
                 except (ValueError, TypeError) as exc:
-                    raise AgentError(f"Некорректный base64: {exc}") from exc
+                    raise AgentError(tr('backend.202', error=exc)) from exc
                 name = str(data.get("file_name") or data.get("name") or "file")
                 mime = str(data.get("mime") or mimetypes.guess_type(name)[0] or "application/octet-stream")
                 messages.append(self._send_one_file(name, blob, mime, caption, chat_id=chat_id))
@@ -436,7 +436,7 @@ class Handler(BaseHTTPRequestHandler):
                         raise AgentError(tr('backend.17'), 413)
                     blob = response.content
                 except requests.RequestException as exc:
-                    raise AgentError(f"Не удалось скачать файл: {exc}", 502) from exc
+                    raise AgentError(tr('backend.203', error=exc), 502) from exc
                 name = str(data.get("file_name") or Path(urlparse(url).path).name or "file")
                 mime = str(data.get("mime") or mimetypes.guess_type(name)[0] or "application/octet-stream")
                 messages.append(self._send_one_file(name, blob, mime, caption, chat_id=chat_id))

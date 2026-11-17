@@ -48,7 +48,7 @@ class TelegramError(Exception):
         if "unauthorized" in low:
             return tr('backend.113')
         if self.code == 429:
-            return f"Telegram ограничил частоту запросов, подождите {self.retry_after or 5} с."
+            return tr('backend.206', seconds=self.retry_after or 5)
         return text
 
 
@@ -80,7 +80,7 @@ class Telegram:
                 )
             except requests.RequestException as exc:
                 if attempt >= retries:
-                    raise TelegramError(f"Нет связи с Telegram: {exc}") from exc
+                    raise TelegramError(tr('backend.207', error=exc)) from exc
                 attempt += 1
                 time.sleep(1.5 * attempt)
                 continue
@@ -88,7 +88,7 @@ class Telegram:
             try:
                 payload = resp.json()
             except ValueError:
-                raise TelegramError(f"Telegram вернул не JSON (HTTP {resp.status_code})")
+                raise TelegramError(tr('backend.208', status=resp.status_code))
 
             if payload.get("ok"):
                 return payload.get("result")
@@ -154,7 +154,7 @@ class Telegram:
         written = 0
         with self._session.get(url, stream=True, timeout=120) as resp:
             if resp.status_code != 200:
-                raise TelegramError(f"Не удалось скачать файл (HTTP {resp.status_code})")
+                raise TelegramError(tr('backend.209', status=resp.status_code))
             total = int(resp.headers.get("Content-Length") or 0)
             with open(tmp, "wb") as fh:
                 for chunk in resp.iter_content(chunk_size=128 * 1024):
@@ -165,7 +165,7 @@ class Telegram:
                         fh.close()
                         tmp.unlink(missing_ok=True)
                         raise TelegramError(
-                            f"Файл больше лимита скачивания ({limit / 1024 / 1024:.0f} МБ)"
+                            tr('backend.210', limit=f'{limit / 1024 / 1024:.0f}')
                         )
                     fh.write(chunk)
                     if on_progress:
