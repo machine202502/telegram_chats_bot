@@ -97,7 +97,8 @@ def find_window() -> int:
             return True
         buffer = ctypes.create_unicode_buffer(length + 1)
         user32.GetWindowTextW(hwnd, buffer, length + 1)
-        if TITLE.lower() in buffer.value.lower():
+        # Только наше окно. Не трогаем браузеры с похожим заголовком.
+        if buffer.value.strip() == TITLE:
             result.append(int(hwnd))
             return False
         return True
