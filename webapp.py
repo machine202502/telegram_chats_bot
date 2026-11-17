@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import hashlib
 import json
 import logging
@@ -26,16 +28,16 @@ from tgclient import Telegram, TelegramError
 log = logging.getLogger(__name__)
 
 KIND_LABELS = {
-    "photo": "Фото",
-    "video": "Видео",
+    "photo": tr('backend.60'),
+    "video": tr('backend.61'),
     "animation": "GIF",
-    "video_note": "Видеосообщение",
-    "voice": "Голосовое",
-    "audio": "Аудио",
-    "sticker": "Стикер",
-    "document": "Файл",
-    "location": "Геопозиция",
-    "contact": "Контакт",
+    "video_note": tr('backend.62'),
+    "voice": tr('backend.63'),
+    "audio": tr('backend.64'),
+    "sticker": tr('backend.65'),
+    "document": tr('backend.66'),
+    "location": tr('backend.67'),
+    "contact": tr('backend.68'),
 }
 
 LOCAL_STORAGE_MARKER = "/var/lib/telegram-bot-api/"
@@ -45,7 +47,7 @@ def _env_bool(name: str, default: bool) -> bool:
     raw = os.environ.get(name)
     if raw is None or raw == "":
         return default
-    return raw.strip().lower() in {"1", "true", "yes", "on", "да"}
+    return raw.strip().lower() in {"1", "true", "yes", "on", tr('backend.69')}
 
 
 def _env_int(name: str, default: int) -> int:
@@ -99,7 +101,7 @@ class WebApp:
         previous_base = self.store.meta_get("api_base")
         if previous_base and previous_base != self.tg.api_base:
             self.store.meta_set("offset", "0")
-            log.warning("Сменилась база Bot API (%s -> %s), offset сброшен",
+            log.warning(tr('backend.70'),
                         previous_base, self.tg.api_base)
         self.store.meta_set("api_base", self.tg.api_base)
 
@@ -134,7 +136,7 @@ class WebApp:
         try:
             self.store.backfill_chat_last()
         except Exception:
-            log.exception("Не удалось заполнить превью чатов")
+            log.exception(tr('backend.71'))
 
     # ------------------------------------------------------------- настройки
     def _init_settings(self) -> None:
@@ -204,14 +206,14 @@ class WebApp:
                     cls = getattr(module, "AsrEngine", None) or getattr(module, "AsrManager")
                     self._asr = cls(self.models_dir)
                 except Exception as exc:
-                    log.exception("Не удалось инициализировать ASR: %s", exc)
+                    log.exception(tr('backend.72'), exc)
                     return None
             return self._asr
 
     def asr_models(self) -> dict[str, Any]:
         engine = self.asr_engine()
         if engine is None:
-            return {"enabled": False, "models": [], "error": "Расшифровка выключена"}
+            return {"enabled": False, "models": [], "error": tr('backend.73')}
         try:
             models = engine.list_models()
         except Exception as exc:
@@ -221,7 +223,7 @@ class WebApp:
     def download_model(self, model_id: str) -> None:
         engine = self.asr_engine()
         if engine is None:
-            raise ValueError("Расшифровка выключена")
+            raise ValueError(tr('backend.73'))
         engine.download(model_id)
 
     # --------------------------------------------------------------- запуск
@@ -236,9 +238,9 @@ class WebApp:
         from web_server import create_servers
 
         create_servers(self, web_port, agent_port)
-        log.info("Веб-интерфейс: http://0.0.0.0:%s", web_port)
+        log.info(tr('backend.74'), web_port)
         if agent_port:
-            log.info("API для агентов: http://0.0.0.0:%s", agent_port)
+            log.info(tr('backend.75'), agent_port)
         try:
             while not self._stop.is_set():
                 time.sleep(0.5)
@@ -288,7 +290,7 @@ class WebApp:
                 "name": me.get("first_name") or me.get("username"),
             }
             self.chat_ready = True
-            log.info("Бот: @%s", me.get("username"))
+            log.info(tr('backend.76'), me.get("username"))
         except TelegramError as exc:
             self.last_error = exc.human()
             log.warning("getMe: %s", exc)
@@ -308,7 +310,7 @@ class WebApp:
                     try:
                         self.handle_update(update)
                     except Exception:
-                        log.exception("Ошибка обработки апдейта")
+                        log.exception(tr('backend.77'))
                     self.store.meta_set("offset", offset)
                 delay = 1.0
             except TelegramError as exc:
@@ -319,8 +321,8 @@ class WebApp:
                 delay = min(delay * 2, 30)
             except requests.RequestException as exc:
                 self.connection = "offline"
-                self.last_error = "Нет связи с Telegram"
-                log.warning("Сеть: %s", exc)
+                self.last_error = tr('backend.78')
+                log.warning(tr('backend.79'), exc)
                 self._stop.wait(delay)
                 delay = min(delay * 2, 30)
 
@@ -361,7 +363,7 @@ class WebApp:
         if start_seen and not allowed and self.settings()["auto_approve"]:
             self.store.set_chat_allowed(chat_id, True)
             allowed = True
-            log.info("Автоподтверждение: пользователь %s добавлен", user_id)
+            log.info(tr('backend.80'), user_id)
             threading.Thread(target=self.ensure_avatar, args=(user_id,), daemon=True).start()
 
         if not allowed:
@@ -380,7 +382,7 @@ class WebApp:
         record["edited"] = 0
         record = self.store.upsert(record)
         preview = (record.get("text") or record.get("caption")
-                   or KIND_LABELS.get(record.get("kind"), "Сообщение"))
+                   or KIND_LABELS.get(record.get("kind"), tr('backend.81')))
         self.store.update_chat_last(chat_id, record["date"], preview)
         self.ensure_avatar_async(user_id)
         self.maybe_auto_transcribe(record)
@@ -498,7 +500,7 @@ class WebApp:
             return False
         file_id = media.get("file_id")
         if not file_id:
-            self.store.patch(msg_id, int(row["chat_id"]), error="Файл потерян (нет file_id)")
+            self.store.patch(msg_id, int(row["chat_id"]), error=tr('backend.82'))
             return False
         self._downloads.put({
             "msg_id": int(msg_id),
@@ -535,7 +537,7 @@ class WebApp:
             try:
                 self._download_one(job)
             except Exception:
-                log.exception("Ошибка загрузчика")
+                log.exception(tr('backend.83'))
 
     def _download_one(self, job: dict[str, Any]) -> None:
         msg_id = int(job["msg_id"])
@@ -547,7 +549,7 @@ class WebApp:
             return
         if row["local_path"]:
             self.store.patch(msg_id, chat_id, local_path=None)
-        log.info("Скачивание вложения %s (%s, %s байт)", msg_id, job.get("kind"), job.get("size"))
+        log.info(tr('backend.84'), msg_id, job.get("kind"), job.get("size"))
         try:
             info = self.tg.get_file(job["file_id"])
         except TelegramError as exc:
@@ -588,9 +590,9 @@ class WebApp:
                 self.store.patch(msg_id, chat_id, media=media)
 
         self.store.patch(msg_id, chat_id, local_path=str(dest), error=None)
-        log.info("Вложение %s сохранено: %s", msg_id, dest.name)
+        log.info(tr('backend.85'), msg_id, dest.name)
         self.store.update_chat_last(chat_id, int(row["date"]),
-                                    KIND_LABELS.get(row["kind"], "Вложение"))
+                                    KIND_LABELS.get(row["kind"], tr('backend.86')))
         updated = self.store.get_raw(msg_id)
         if updated and self.settings()["auto_transcribe"] and updated["direction"] == "in" \
                 and updated["kind"] in ("voice", "audio") and not updated["transcript"]:
@@ -642,7 +644,7 @@ class WebApp:
             try:
                 self._run_transcription(msg_id)
             except Exception as exc:
-                log.exception("Ошибка расшифровки")
+                log.exception(tr('backend.87'))
                 row = self.store.get_raw(msg_id)
                 if row:
                     self.store.patch(msg_id, int(row["chat_id"]), transcript_state="error",
@@ -659,12 +661,12 @@ class WebApp:
         path = self.media_path(msg_id)
         if path is None:
             self.store.patch(msg_id, chat_id, transcript_state="error",
-                             transcript_error="Файл не скачан")
+                             transcript_error=tr('backend.88'))
             return
         engine = self.asr_engine()
         if engine is None:
             self.store.patch(msg_id, chat_id, transcript_state="error",
-                             transcript_error="Расшифровка отключена")
+                             transcript_error=tr('backend.89'))
             return
         self.store.patch(msg_id, chat_id, transcript_state="running", transcript_error=None)
         model = self.settings()["asr_model"] or None
@@ -681,7 +683,7 @@ class WebApp:
                 pass
         if not text:
             self.store.patch(msg_id, chat_id, transcript_state="error",
-                             transcript_error="Речь не распознана")
+                             transcript_error=tr('backend.90'))
             return
         self.store.patch(msg_id, chat_id, transcript=text, transcript_state="done",
                          transcript_error=None)
@@ -761,5 +763,5 @@ class WebApp:
             "error": None,
             "edited": 0,
         })
-        self.store.update_chat_last(chat_id, record["date"], caption or f"[{KIND_LABELS.get(actual, 'Файл')}]")
+        self.store.update_chat_last(chat_id, record["date"], caption or f"[{KIND_LABELS.get(actual, tr('backend.66'))}]")
         return record, None

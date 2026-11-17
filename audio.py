@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import logging
 from pathlib import Path
 
@@ -13,7 +15,7 @@ def convert_to_mp3(source: Path, dest: Path | None = None) -> Path | None:
     try:
         import soundfile as sf
     except Exception as exc:  # pragma: no cover - зависит от окружения
-        log.warning("soundfile недоступен, голосовое останется в исходном формате: %s", exc)
+        log.warning(tr('backend.124'), exc)
         return None
 
     target = dest or source.with_suffix(".mp3")
@@ -22,10 +24,10 @@ def convert_to_mp3(source: Path, dest: Path | None = None) -> Path | None:
         sf.write(str(target), data, samplerate, format="MP3", subtype="MPEG_LAYER_III")
         if target.is_file() and target.stat().st_size > 0:
             return target
-        log.warning("После конвертации получился пустой файл: %s", target)
+        log.warning(tr('backend.125'), target)
         return None
     except Exception as exc:
-        log.warning("Не удалось конвертировать %s в MP3: %s", source.name, exc)
+        log.warning(tr('backend.126'), source.name, exc)
         try:
             target.unlink(missing_ok=True)
         except OSError:

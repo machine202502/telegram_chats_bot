@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import logging
 import mimetypes
 import os
@@ -69,7 +71,7 @@ def _user_json(app: WebApp, user: dict[str, Any]) -> dict[str, Any]:
 def _require_chat(app: WebApp, chat_id: int) -> dict[str, Any]:
     chat = app.store.get_chat(chat_id)
     if not chat or not chat.get("allowed"):
-        raise ApiError("Чат не добавлен в поддержку", 403)
+        raise ApiError(tr('backend.91'), 403)
     return chat
 
 
@@ -131,7 +133,7 @@ def create_flask(app: WebApp) -> Flask:
     def _any_error(exc: Exception):
         if isinstance(exc, HTTPException):
             return jsonify({"ok": False, "error": exc.description}), exc.code
-        log.exception("Необработанная ошибка")
+        log.exception(tr('backend.92'))
         return jsonify({"ok": False, "error": str(exc)}), 500
 
     @flask_app.get("/")
@@ -194,9 +196,9 @@ def create_flask(app: WebApp) -> Flask:
             try:
                 user_id = int(user_id)
             except (TypeError, ValueError):
-                raise ApiError("ID должен быть числом")
+                raise ApiError(tr('backend.93'))
         if not user_id and not username:
-            raise ApiError("Укажите ID или @username")
+            raise ApiError(tr('backend.94'))
         try:
             chat = app.add_chat(user_id=user_id, username=username)
         except ValueError as exc:
@@ -205,7 +207,7 @@ def create_flask(app: WebApp) -> Flask:
             log.exception("add_chat")
             raise ApiError(f"Не удалось добавить: {exc}", 502)
         if not chat:
-            raise ApiError("Не удалось получить данные чата", 502)
+            raise ApiError(tr('backend.95'), 502)
         return jsonify({"ok": True, "chat": _chat_json(app, chat)})
 
     @flask_app.post("/api/chats/remove")
@@ -213,7 +215,7 @@ def create_flask(app: WebApp) -> Flask:
         data = request.get_json(silent=True) or {}
         chat_id = int(data.get("chat_id") or 0)
         if not chat_id:
-            raise ApiError("Не указан chat_id")
+            raise ApiError(tr('backend.96'))
         app.remove_chat(chat_id)
         return jsonify({"ok": True})
 
@@ -222,7 +224,7 @@ def create_flask(app: WebApp) -> Flask:
         data = request.get_json(silent=True) or {}
         chat_id = int(data.get("chat_id") or 0)
         if not chat_id:
-            raise ApiError("Не указан chat_id")
+            raise ApiError(tr('backend.96'))
         app.delete_chat(chat_id)
         return jsonify({"ok": True})
 
@@ -236,7 +238,7 @@ def create_flask(app: WebApp) -> Flask:
     def messages():
         chat_id = int(request.args.get("chat_id") or 0)
         if not chat_id:
-            raise ApiError("Не указан chat_id")
+            raise ApiError(tr('backend.96'))
         _require_chat(app, chat_id)
         rev = int(request.args.get("rev") or 0)
         before_id = int(request.args.get("before_id") or 0)
@@ -262,10 +264,10 @@ def create_flask(app: WebApp) -> Flask:
         chat_id = int(data.get("chat_id") or 0)
         text = str(data.get("text") or "")
         if not chat_id:
-            raise ApiError("Не указан chat_id")
+            raise ApiError(tr('backend.96'))
         _require_chat(app, chat_id)
         if not text.strip():
-            raise ApiError("Пустое сообщение")
+            raise ApiError(tr('backend.97'))
         messages, error = app.send_text(chat_id, text)
         if error:
             raise ApiError(error, 502)
@@ -275,11 +277,11 @@ def create_flask(app: WebApp) -> Flask:
     def upload():
         chat_id = int(request.args.get("chat_id") or request.form.get("chat_id") or 0)
         if not chat_id:
-            raise ApiError("Не указан chat_id")
+            raise ApiError(tr('backend.96'))
         _require_chat(app, chat_id)
         files = request.files.getlist("file")
         if not files:
-            raise ApiError("Нет файлов")
+            raise ApiError(tr('backend.98'))
         caption = request.form.get("caption") or ""
         messages = []
         for index, item in enumerate(files):
@@ -306,10 +308,10 @@ def create_flask(app: WebApp) -> Flask:
         data = request.get_json(silent=True) or {}
         msg_id = int(data.get("id") or 0)
         if not msg_id:
-            raise ApiError("Не указан id")
+            raise ApiError(tr('backend.99'))
         row = app.store.get_raw(msg_id)
         if row is None:
-            raise ApiError("Сообщение не найдено", 404)
+            raise ApiError(tr('backend.100'), 404)
         _require_chat(app, int(row["chat_id"]))
         ok = app.ensure_media(msg_id)
         return jsonify({"ok": ok, "queued": bool(ok)})
@@ -319,14 +321,14 @@ def create_flask(app: WebApp) -> Flask:
         data = request.get_json(silent=True) or {}
         msg_id = int(data.get("id") or 0)
         if not msg_id:
-            raise ApiError("Не указан id")
+            raise ApiError(tr('backend.99'))
         row = app.store.get_raw(msg_id)
         if row is None:
-            raise ApiError("Сообщение не найдено", 404)
+            raise ApiError(tr('backend.100'), 404)
         _require_chat(app, int(row["chat_id"]))
         message = app.enqueue_transcription(msg_id)
         if message is None:
-            raise ApiError("Расшифровка отключена", 400)
+            raise ApiError(tr('backend.89'), 400)
         return jsonify({"ok": True, "message": message})
 
     @flask_app.post("/api/retry_media")
@@ -334,10 +336,10 @@ def create_flask(app: WebApp) -> Flask:
         data = request.get_json(silent=True) or {}
         msg_id = int(data.get("id") or 0)
         if not msg_id:
-            raise ApiError("Не указан id")
+            raise ApiError(tr('backend.99'))
         row = app.store.get_raw(msg_id)
         if row is None:
-            raise ApiError("Сообщение не найдено", 404)
+            raise ApiError(tr('backend.100'), 404)
         _require_chat(app, int(row["chat_id"]))
         message = app.retry_media(msg_id)
         return jsonify({"ok": True, "message": message})
@@ -357,7 +359,7 @@ def create_flask(app: WebApp) -> Flask:
         data = request.get_json(silent=True) or {}
         model = str(data.get("model") or "").strip()
         if not model:
-            raise ApiError("Не указана модель")
+            raise ApiError(tr('backend.101'))
         try:
             app.download_model(model)
         except Exception as exc:
@@ -368,14 +370,14 @@ def create_flask(app: WebApp) -> Flask:
     def link_preview():
         url = (request.args.get("url") or "").strip()
         if not url:
-            raise ApiError("Не указана ссылка")
+            raise ApiError(tr('backend.102'))
         try:
             preview = linkpreview.fetch_preview(url)
         except linkpreview.PreviewError as exc:
             return jsonify({"ok": False, "error": str(exc)}), 200
         except Exception as exc:
             log.info("link_preview %s: %s", url, exc)
-            return jsonify({"ok": False, "error": "Не удалось получить превью"}), 200
+            return jsonify({"ok": False, "error": tr('backend.103')}), 200
         return jsonify({"ok": True, "preview": preview})
 
     @flask_app.get("/api/avatar/<int:user_id>")
@@ -392,10 +394,10 @@ def create_flask(app: WebApp) -> Flask:
     def media(msg_id: int):
         row = app.store.get_raw(msg_id)
         if row is None:
-            raise ApiError("Файл не найден", 404)
+            raise ApiError(tr('backend.104'), 404)
         path = app.media_path(msg_id)
         if path is None:
-            raise ApiError("Файл ещё не скачан", 404)
+            raise ApiError(tr('backend.105'), 404)
         as_attachment = request.args.get("download") == "1"
         name = path.name
         try:
@@ -441,7 +443,7 @@ def _adapt_agent_app(app: WebApp):
             chat = self.store.get_chat(cid) if cid else None
             if not chat or not chat.get("allowed"):
                 raise agent_api.AgentError(
-                    "Чат не найден или пользователь заблокирован", 404
+                    tr('backend.106'), 404
                 )
             return cid
 
@@ -505,7 +507,7 @@ def _adapt_agent_app(app: WebApp):
         def unblock_user(self, chat_id=None) -> dict[str, Any]:
             cid = int(chat_id) if chat_id not in (None, "") else self.chat_id
             if not cid:
-                raise agent_api.AgentError("Не указан chat_id", 400)
+                raise agent_api.AgentError(tr('backend.96'), 400)
             self.store.set_chat_allowed(cid, True)
             return self.store.get_chat(cid) or {"id": cid, "allowed": True}
 
@@ -542,7 +544,7 @@ def create_servers(app: WebApp, web_port: int, agent_port: int | None = None) ->
             app._agent_server = server
             app._agent_info = info
         except Exception:
-            log.exception("Не удалось запустить API для агентов")
+            log.exception(tr('backend.107'))
 
     thread = threading.Thread(
         target=lambda: serve(flask_app, host="0.0.0.0", port=int(web_port), threads=16),

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 from typing import Any
 
 
@@ -45,20 +47,20 @@ def _forward_info(message: dict[str, Any]) -> dict[str, Any] | None:
             ).strip()
             return {
                 "type": "user",
-                "name": name or user.get("username") or "неизвестный",
+                "name": name or user.get("username") or tr('backend.127'),
                 "username": user.get("username"),
                 "id": user.get("id"),
             }
         if kind == "hidden_user":
             return {
                 "type": "hidden_user",
-                "name": origin.get("sender_user_name") or "неизвестный",
+                "name": origin.get("sender_user_name") or tr('backend.127'),
             }
         if kind in ("chat", "channel"):
             chat = origin.get("chat") or {}
             return {
                 "type": kind,
-                "name": chat.get("title") or "чат",
+                "name": chat.get("title") or tr('backend.128'),
                 "username": chat.get("username"),
                 "id": chat.get("id"),
                 "message_id": origin.get("message_id"),
@@ -72,7 +74,7 @@ def _forward_info(message: dict[str, Any]) -> dict[str, Any] | None:
         ).strip()
         return {
             "type": "user",
-            "name": name or user.get("username") or "неизвестный",
+            "name": name or user.get("username") or tr('backend.127'),
             "username": user.get("username"),
             "id": user.get("id"),
         }
@@ -80,14 +82,14 @@ def _forward_info(message: dict[str, Any]) -> dict[str, Any] | None:
         chat = message["forward_from_chat"]
         return {
             "type": "channel" if chat.get("type") == "channel" else "chat",
-            "name": chat.get("title") or "чат",
+            "name": chat.get("title") or tr('backend.128'),
             "username": chat.get("username"),
             "id": chat.get("id"),
         }
     if message.get("forward_sender_name"):
         return {"type": "hidden_user", "name": message["forward_sender_name"]}
     if message.get("forward_date"):
-        return {"type": "hidden_user", "name": "неизвестный"}
+        return {"type": "hidden_user", "name": tr('backend.127')}
     return None
 
 

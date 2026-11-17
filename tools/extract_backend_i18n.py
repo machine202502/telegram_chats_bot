@@ -56,11 +56,12 @@ def process(path: Path) -> None:
         offsets.append(offsets[-1] + len(line))
     docs = docstring_positions(source)
     tokens = list(tokenize.generate_tokens(io.StringIO(source).readline))
+    significant = {tokenize.NAME, tokenize.NUMBER, tokenize.STRING, tokenize.OP}
+    significant |= {getattr(tokenize, name) for name in ("FSTRING_START", "FSTRING_MIDDLE", "FSTRING_END") if hasattr(tokenize, name)}
     replacements: list[tuple[int, int, str]] = []
     for idx, token in enumerate(tokens):
         if token.type != tokenize.STRING:
             continue
-        prefix = token.string[: token.string.find(token.string.lstrip("rRuUbBfF")[:1])] if False else ""
         match = re.match(r"([rRuUbBfF]*)('''|\"\"\"|'|\")", token.string)
         if not match:
             continue
@@ -75,12 +76,15 @@ def process(path: Path) -> None:
             continue
         if not isinstance(value, str) or not CYR.search(value):
             continue
-        # соседние строковые литералы склеиваются Python'ом — их не трогаем
-        prev = tokens[idx - 1] if idx > 0 else None
-        nxt = tokens[idx + 1] if idx + 1 < len(tokens) else None
-        if prev and prev.type == tokenize.STRING:
+        # Соседние строковые литералы Python склеивает; t() между ними
+        # сломал бы синтаксис, поэтому такие литералы не трогаем.
+        prev = next((tokens[j] for j in range(idx - 1, -1, -1) if tokens[j].type in significant), None)
+        nxt = next((tokens[j] for j in range(idx + 1, len(tokens)) if tokens[j].type in significant), None)
+        stringish = {tokenize.STRING}
+        stringish |= {getattr(tokenize, name) for name in ("FSTRING_START", "FSTRING_MIDDLE", "FSTRING_END") if hasattr(tokenize, name)}
+        if prev and prev.type in stringish:
             continue
-        if nxt and nxt.type == tokenize.STRING:
+        if nxt and nxt.type in stringish:
             continue
         start = offsets[token.start[0] - 1] + token.start[1]
         end = offsets[token.end[0] - 1] + token.end[1]

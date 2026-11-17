@@ -40,6 +40,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import gc
 import logging
 import os
@@ -113,7 +115,7 @@ class ModelSpec:
                 f"допустимо: {', '.join(ENGINES)}"
             )
         if not self.files:
-            raise ValueError("У модели должен быть хотя бы один файл")
+            raise ValueError(tr('backend.129'))
         object.__setattr__(self, "files", tuple(self.files))
         object.__setattr__(self, "options", dict(self.options))
 
@@ -130,7 +132,7 @@ def register_model(spec: ModelSpec, *, replace: bool = True) -> ModelSpec:
     """Добавить (или заменить) модель в реестре. Возвращает ``spec``."""
 
     if not isinstance(spec, ModelSpec):
-        raise TypeError("Ожидается ModelSpec")
+        raise TypeError(tr('backend.130'))
     if spec.id in MODEL_REGISTRY and not replace:
         raise ValueError(f"Модель {spec.id!r} уже зарегистрирована")
     MODEL_REGISTRY[spec.id] = spec
@@ -140,7 +142,7 @@ def register_model(spec: ModelSpec, *, replace: bool = True) -> ModelSpec:
 register_model(
     ModelSpec(
         id="gigaam-v3-rnnt-punct",
-        title="GigaAM v3 RNN-T с пунктуацией",
+        title=tr('backend.131'),
         language="ru",
         size_mb=225,
         engine="transducer",
@@ -158,7 +160,7 @@ register_model(
 register_model(
     ModelSpec(
         id="gigaam-v3-ctc-punct",
-        title="GigaAM v3 CTC с пунктуацией",
+        title=tr('backend.132'),
         language="ru",
         size_mb=225,
         engine="nemo_ctc",
@@ -208,7 +210,7 @@ def _import_sherpa_onnx():
         import sherpa_onnx  # noqa: PLC0415 — тяжёлый импорт только по требованию
     except ImportError as exc:  # pragma: no cover - зависит от окружения
         raise AsrError(
-            "Не установлен sherpa-onnx. Установите: pip install sherpa-onnx"
+            tr('backend.133')
         ) from exc
     return sherpa_onnx
 
@@ -391,7 +393,7 @@ class AsrEngine:
                 if status["error"]:
                     raise AsrError(status["error"])
                 if not status["downloaded"]:
-                    raise AsrError("Модель не скачана")
+                    raise AsrError(tr('backend.134'))
                 return status
             if deadline is not None and time.monotonic() >= deadline:
                 raise AsrError(
@@ -414,7 +416,7 @@ class AsrEngine:
         target_dir = self._model_dir(model_id)
         try:
             target_dir.mkdir(parents=True, exist_ok=True)
-            log.info("Скачивание модели %s в %s", model_id, target_dir)
+            log.info(tr('backend.135'), model_id, target_dir)
             sizes = self._probe_sizes(spec)
             known_total = sum(size for size in sizes.values() if size)
             all_known = all(sizes.get(name) for name in spec.files)
@@ -458,7 +460,7 @@ class AsrEngine:
             ]
             if missing:
                 raise AsrError(
-                    "После загрузки не хватает файлов: " + ", ".join(missing)
+                    tr('backend.136') + ", ".join(missing)
                 )
             if all_known:
                 bad = []
@@ -471,7 +473,7 @@ class AsrEngine:
                         bad.append(name)
                 if bad:
                     raise AsrError(
-                        "Размер скачанных файлов не совпал с сервером: "
+                        tr('backend.137')
                         + ", ".join(bad)
                     )
 
@@ -482,12 +484,12 @@ class AsrEngine:
                 state.error = None
                 state.finished_at = time.time()
             self._drop_recognizer(model_id)
-            log.info("Модель %s скачана (%d байт)", model_id, done_bytes)
+            log.info(tr('backend.138'), model_id, done_bytes)
         except Exception as exc:  # noqa: BLE001 — ошибку показываем пользователю
             message = str(exc).strip() or exc.__class__.__name__
             if not isinstance(exc, AsrError):
                 message = f"Ошибка загрузки: {message}"
-            log.exception("Не удалось скачать модель %s", model_id)
+            log.exception(tr('backend.139'), model_id)
             with self._lock:
                 state.error = message
                 state.progress = min(state.progress, 99.0)
@@ -538,7 +540,7 @@ class AsrEngine:
                     and status not in (408, 429)
                 )
                 log.warning(
-                    "Скачивание %s: попытка %d/%d не удалась: %s",
+                    tr('backend.140'),
                     dest.name,
                     attempt,
                     _ATTEMPTS,
@@ -603,7 +605,7 @@ class AsrEngine:
                 content_range = response.headers.get("Content-Range", "")
                 if not content_range.startswith(f"bytes {resume}-"):
                     log.warning(
-                        "Сервер вернул неверный Content-Range %r, качаю заново",
+                        tr('backend.141'),
                         content_range,
                     )
                     resume = 0
@@ -676,14 +678,14 @@ class AsrEngine:
                         size = int(length)
                 else:
                     log.warning(
-                        "HEAD %s: HTTP %d, размер неизвестен",
+                        tr('backend.142'),
                         filename,
                         response.status_code,
                     )
             except AsrError:
                 raise
             except Exception as exc:  # noqa: BLE001
-                log.warning("HEAD %s не удался: %s", filename, exc)
+                log.warning(tr('backend.143'), filename, exc)
             sizes[filename] = size
         return sizes
 
@@ -872,12 +874,12 @@ class AsrEngine:
                 error = state.error if state else None
             if downloading:
                 log.warning(
-                    "Модель %s ещё скачивается, ищу уже готовую", spec.id
+                    tr('backend.144'), spec.id
                 )
             elif error:
-                log.warning("Модель %s не скачана (%s), ищу готовую", spec.id, error)
+                log.warning(tr('backend.145'), spec.id, error)
             else:
-                log.warning("Модель %s не скачана, ищу готовую", spec.id)
+                log.warning(tr('backend.146'), spec.id)
 
         for candidate in list(MODEL_REGISTRY.values()):
             if self._files_present(candidate):
@@ -893,7 +895,7 @@ class AsrEngine:
                         "дождитесь окончания загрузки"
                     )
             raise AsrError(f"Модель не скачана: «{spec.title}»")
-        raise AsrError("Модель не скачана")
+        raise AsrError(tr('backend.134'))
 
     def transcribe(self, audio_path: Path, model_id: str | None = None) -> str:
         """Расшифровать аудиофайл. Синхронный вызов, возвращает текст.
@@ -918,7 +920,7 @@ class AsrEngine:
         if audio.size == 0:
             raise AsrError(f"Аудиофайл пустой: {path}")
         if self._rms(audio) < MIN_RMS:
-            log.info("Аудио %s тише порога, возвращаю пустой текст", path)
+            log.info(tr('backend.147'), path)
             return ""
 
         chunks = self._split(audio)
@@ -989,7 +991,7 @@ class AsrEngine:
             import soundfile as sf  # noqa: PLC0415
         except ImportError as exc:  # pragma: no cover
             raise AsrError(
-                "Не установлен soundfile. Установите: pip install soundfile"
+                tr('backend.148')
             ) from exc
 
         try:

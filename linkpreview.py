@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import html as html_module
 import ipaddress
 import json
@@ -38,23 +40,23 @@ def _host_is_public(host: str) -> bool:
     try:
         infos = socket.getaddrinfo(host, None)
     except OSError as exc:
-        raise PreviewError("Не удалось разрешить адрес") from exc
+        raise PreviewError(tr('backend.120')) from exc
     for info in infos:
         try:
             address = ipaddress.ip_address(info[4][0])
         except ValueError:
             continue
         if not address.is_global:
-            raise PreviewError("Локальные адреса запрещены")
+            raise PreviewError(tr('backend.121'))
     return True
 
 
 def _validate(url: str) -> tuple[str, str]:
     parsed = urlparse(url.strip())
     if parsed.scheme not in ("http", "https") or not parsed.hostname:
-        raise PreviewError("Некорректная ссылка")
+        raise PreviewError(tr('backend.122'))
     if parsed.username or parsed.password:
-        raise PreviewError("Некорректная ссылка")
+        raise PreviewError(tr('backend.122'))
     _host_is_public(parsed.hostname)
     return parsed.geturl(), parsed.hostname
 
@@ -107,7 +109,7 @@ def _fetch_page(url: str) -> tuple[str, str, str]:
     parsed_final = urlparse(final_url)
     if parsed_final.scheme not in ("http", "https") or not parsed_final.hostname:
         response.close()
-        raise PreviewError("Некорректный редирект")
+        raise PreviewError(tr('backend.123'))
     _host_is_public(parsed_final.hostname)
     ctype = (response.headers.get("Content-Type") or "").lower()
     encoding = response.encoding or "utf-8"

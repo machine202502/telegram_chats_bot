@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import logging
 import mimetypes
 import os
@@ -34,17 +36,17 @@ class TelegramError(Exception):
         text = self.description
         low = text.lower()
         if "chat not found" in low:
-            return "Чат не найден: сначала напишите боту в Telegram (кнопка Start)."
+            return tr('backend.108')
         if "bot was blocked" in low or "user is deactivated" in low:
-            return "Бот заблокирован пользователем в Telegram."
+            return tr('backend.109')
         if "bot can't initiate conversation" in low:
-            return "Бот не может начать диалог первым — напишите ему /start в Telegram."
+            return tr('backend.110')
         if "too big" in low:
-            return "Файл слишком большой для Bot API (документы — до 50 МБ, видео — до 50 МБ, фото — до 10 МБ)."
+            return tr('backend.111')
         if "invalid file" in low or "wrong file" in low:
-            return "Telegram не принял файл (неподдерживаемый формат или повреждён)."
+            return tr('backend.112')
         if "unauthorized" in low:
-            return "Неверный токен бота в config.json."
+            return tr('backend.113')
         if self.code == 429:
             return f"Telegram ограничил частоту запросов, подождите {self.retry_after or 5} с."
         return text
@@ -140,7 +142,7 @@ class Telegram:
             # Локальный Bot API отдаёт абсолютный путь внутри своего контейнера.
             if not self.files_base:
                 raise TelegramError(
-                    "Локальный Bot API: задайте api_files_base (HTTP-доступ к папке с файлами)"
+                    tr('backend.114')
                 )
             marker = "/var/lib/telegram-bot-api/"
             rel = file_path[len(marker):] if file_path.startswith(marker) else file_path.lstrip("/")
@@ -203,7 +205,7 @@ class Telegram:
             )
             if not retry_as_document:
                 raise
-            log.warning("Не удалось отправить как %s, отправляю документом: %s", method, exc)
+            log.warning(tr('backend.115'), method, exc)
             return attempt("document", "sendDocument")
 
 

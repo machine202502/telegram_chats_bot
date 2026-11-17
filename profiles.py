@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import logging
 from pathlib import Path
 from typing import Any
@@ -26,7 +28,7 @@ def resolve_chat(tg: Telegram, query: str, known_users: list[dict[str, Any]] | N
     """Найти пользователя по ID или @username через Bot API (с запасным поиском)."""
     raw = (query or "").strip()
     if not raw:
-        raise ValueError("Пустой ID или username")
+        raise ValueError(tr('backend.116'))
     candidates: list[Any] = []
     if raw.lstrip("-").isdigit():
         candidates.append(int(raw))
@@ -67,7 +69,7 @@ def resolve_chat(tg: Telegram, query: str, known_users: list[dict[str, Any]] | N
                 }
 
     raise ValueError(
-        f"Пользователь не найден ({last_error or 'нет такого username/ID'}). "
+        f"Пользователь не найден ({last_error or tr('backend.117')}). "
         "Он должен хотя бы раз написать боту /start."
     )
 
@@ -87,7 +89,7 @@ def download_avatar(tg: Telegram, user_id: int, dest_dir: Path) -> Path | None:
             "getUserProfilePhotos", {"user_id": int(user_id), "limit": 1}, timeout=20
         )
     except TelegramError as exc:
-        log.info("Аватар %s недоступен: %s", user_id, exc)
+        log.info(tr('backend.118'), user_id, exc)
         return None
 
     rows = (photos or {}).get("photos") or []
@@ -100,6 +102,6 @@ def download_avatar(tg: Telegram, user_id: int, dest_dir: Path) -> Path | None:
         info = tg.get_file(best["file_id"])
         tg.download(info["file_path"], dest, limit=15 * 1024 * 1024)
     except (TelegramError, OSError) as exc:
-        log.warning("Не удалось скачать аватар %s: %s", user_id, exc)
+        log.warning(tr('backend.119'), user_id, exc)
         return None
     return dest if dest.is_file() else None

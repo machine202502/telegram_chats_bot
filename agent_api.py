@@ -19,6 +19,8 @@
 
 from __future__ import annotations
 
+from i18n import tr
+
 import base64
 import ipaddress
 import json
@@ -136,7 +138,7 @@ class Handler(BaseHTTPRequestHandler):
     def _send_media(self, msg_id: int) -> None:
         path = self.app.media_path(msg_id)
         if path is None or not path.is_file():
-            raise AgentError("Файл не найден или ещё не скачан", 404)
+            raise AgentError(tr('backend.1'), 404)
         filename = path.name
         try:
             row = self.app.store.get_raw(msg_id)
@@ -168,14 +170,14 @@ class Handler(BaseHTTPRequestHandler):
         if expected:
             given = (query.get("token") or [""])[0] or self.headers.get("X-Token", "")
             if given != expected:
-                raise AgentError("Неверный токен API", 401)
+                raise AgentError(tr('backend.2'), 401)
         if self.app.config.get("agent_allow_private", True):
             try:
                 client = ipaddress.ip_address(self.client_address[0])
             except ValueError:
                 client = None
             if client is not None and not (client.is_private or client.is_loopback):
-                raise AgentError("Доступ только из локальной сети", 403)
+                raise AgentError(tr('backend.3'), 403)
 
     def _base_url(self) -> str:
         host = self.headers.get("Host") or f"{lan_ip()}:{self.server.server_address[1]}"
@@ -186,10 +188,10 @@ class Handler(BaseHTTPRequestHandler):
         if length <= 0:
             return b""
         if length > MAX_BODY:
-            raise AgentError("Слишком большой запрос", 413)
+            raise AgentError(tr('backend.4'), 413)
         data = self.rfile.read(length)
         if len(data) != length:
-            raise AgentError("Тело запроса прочитано не полностью", 400)
+            raise AgentError(tr('backend.5'), 400)
         return data
 
     def _read_json_or_form(self, body: bytes) -> dict[str, Any]:
@@ -200,7 +202,7 @@ class Handler(BaseHTTPRequestHandler):
             except (UnicodeDecodeError, ValueError) as exc:
                 raise AgentError(f"Некорректный JSON: {exc}") from exc
             if not isinstance(data, dict):
-                raise AgentError("JSON должен быть объектом")
+                raise AgentError(tr('backend.6'))
             return data
         if "application/x-www-form-urlencoded" in ctype:
             parsed = parse_qs(body.decode("utf-8", "replace"))
@@ -223,7 +225,7 @@ class Handler(BaseHTTPRequestHandler):
     def _send_one_file(self, name: str, data: bytes, mime: str,
                        caption: str, chat_id=None) -> dict[str, Any]:
         if not data:
-            raise AgentError("Пустой файл")
+            raise AgentError(tr('backend.7'))
         tmp = self._save_temp(name, data)
         try:
             message, error = self.app.send_file(
@@ -281,10 +283,10 @@ class Handler(BaseHTTPRequestHandler):
                 try:
                     msg_id = int(path.rsplit("/", 1)[-1])
                 except ValueError:
-                    raise AgentError("Некорректный id файла", 400)
+                    raise AgentError(tr('backend.8'), 400)
                 self._send_media(msg_id)
             else:
-                raise AgentError("Неизвестный метод. GET /api/help — список эндпоинтов", 404)
+                raise AgentError(tr('backend.9'), 404)
         except AgentError as exc:
             self._json({"ok": False, "error": exc.message}, exc.status)
         except Exception as exc:  # pragma: no cover
@@ -309,7 +311,7 @@ class Handler(BaseHTTPRequestHandler):
             elif path in ("/users/unblock", "/user/unblock", "/users/allow", "/user/allow"):
                 self._unblock_user(body)
             else:
-                raise AgentError("Неизвестный метод. GET /api/help — список эндпоинтов", 404)
+                raise AgentError(tr('backend.9'), 404)
         except AgentError as exc:
             self._json({"ok": False, "error": exc.message}, exc.status)
         except Exception as exc:  # pragma: no cover
@@ -322,12 +324,12 @@ class Handler(BaseHTTPRequestHandler):
         user_id = data.get("user_id") or data.get("id") or data.get("chat_id")
         username = str(data.get("username") or "").strip() or None
         if not user_id and not username:
-            raise AgentError("Укажите user_id или username")
+            raise AgentError(tr('backend.10'))
         if user_id not in (None, ""):
             try:
                 user_id = int(user_id)
             except (TypeError, ValueError) as exc:
-                raise AgentError("user_id должен быть числом") from exc
+                raise AgentError(tr('backend.11')) from exc
         try:
             chat = self.app.add_user(user_id=user_id, username=username)
         except AgentError:
@@ -340,7 +342,7 @@ class Handler(BaseHTTPRequestHandler):
         data = self._read_json_or_form(body)
         chat_id = data.get("chat_id") or data.get("user_id") or data.get("id")
         if not chat_id:
-            raise AgentError("Укажите chat_id или user_id")
+            raise AgentError(tr('backend.12'))
         try:
             chat = self.app.block_user(int(chat_id))
         except ValueError as exc:
@@ -351,7 +353,7 @@ class Handler(BaseHTTPRequestHandler):
         data = self._read_json_or_form(body)
         chat_id = data.get("chat_id") or data.get("user_id") or data.get("id")
         if not chat_id:
-            raise AgentError("Укажите chat_id или user_id")
+            raise AgentError(tr('backend.12'))
         try:
             chat = self.app.unblock_user(int(chat_id))
         except ValueError as exc:
@@ -362,7 +364,7 @@ class Handler(BaseHTTPRequestHandler):
         data = self._read_json_or_form(body)
         text = str(data.get("text") or data.get("message") or "").strip()
         if not text:
-            raise AgentError("Нужно поле text")
+            raise AgentError(tr('backend.13'))
         mode = str(data.get("parse") or data.get("parse_mode") or "md").lower()
         plain = mode in ("plain", "text", "none")
         chat_id = data.get("chat_id") or data.get("user_id")
@@ -396,7 +398,7 @@ class Handler(BaseHTTPRequestHandler):
             caption = str(fields.get("caption") or caption or "")
             target_raw = str(fields.get("chat_id") or fields.get("user_id") or target_raw or "")
             if not files:
-                raise AgentError("В multipart нет файла (поле file)")
+                raise AgentError(tr('backend.14'))
             for filename, data, mime in files:
                 messages.append(self._send_one_file(filename, data, mime, caption,
                                                      chat_id=self._chat_arg(target_raw)))
@@ -417,7 +419,7 @@ class Handler(BaseHTTPRequestHandler):
             elif data.get("path"):
                 source = Path(str(data["path"])).expanduser()
                 if not source.is_file():
-                    raise AgentError("Файл по указанному path не найден", 404)
+                    raise AgentError(tr('backend.15'), 404)
                 blob = source.read_bytes()
                 name = str(data.get("file_name") or source.name)
                 mime = str(data.get("mime") or mimetypes.guess_type(name)[0] or "application/octet-stream")
@@ -425,13 +427,13 @@ class Handler(BaseHTTPRequestHandler):
             elif data.get("url"):
                 url = str(data["url"])
                 if not url.lower().startswith(("http://", "https://")):
-                    raise AgentError("url должен начинаться с http:// или https://")
+                    raise AgentError(tr('backend.16'))
                 try:
                     response = requests.get(url, timeout=60, stream=True)
                     response.raise_for_status()
                     length = int(response.headers.get("Content-Length") or 0)
                     if length > MAX_BODY:
-                        raise AgentError("Файл по ссылке слишком большой", 413)
+                        raise AgentError(tr('backend.17'), 413)
                     blob = response.content
                 except requests.RequestException as exc:
                     raise AgentError(f"Не удалось скачать файл: {exc}", 502) from exc
@@ -439,12 +441,12 @@ class Handler(BaseHTTPRequestHandler):
                 mime = str(data.get("mime") or mimetypes.guess_type(name)[0] or "application/octet-stream")
                 messages.append(self._send_one_file(name, blob, mime, caption, chat_id=chat_id))
             else:
-                raise AgentError("Нужно file_base64, path или url")
+                raise AgentError(tr('backend.18'))
         else:
             name = (query.get("name") or [""])[0] or self.headers.get("X-Filename") or "file"
             mime = (self.headers.get("Content-Type") or "").split(";")[0].strip()
             if not body:
-                raise AgentError("Пустое тело запроса")
+                raise AgentError(tr('backend.19'))
             messages.append(self._send_one_file(name, body, mime or "application/octet-stream",
                                                 caption, chat_id=self._chat_arg(target_raw)))
 
@@ -462,7 +464,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             return int(value) if value not in (None, "") else None
         except (TypeError, ValueError):
-            raise AgentError("chat_id должен быть числом")
+            raise AgentError(tr('backend.20'))
 
     # ---------------------------------------------------------------- metadata
     def _status(self) -> dict[str, Any]:
@@ -500,7 +502,7 @@ class Handler(BaseHTTPRequestHandler):
             },
             "help": {
                 "endpoint": f"{base}/api/help",
-                "note": "Этот документ. Все пути работают как с префиксом /api, так и без него.",
+                "note": tr('backend.21'),
             },
             "auth": {
                 "type": "token" if token_required else "none",
@@ -508,21 +510,21 @@ class Handler(BaseHTTPRequestHandler):
                     "Токен задан в config.json (agent_token). Передавайте его в заголовке "
                     "X-Token или параметром ?token=..."
                     if token_required
-                    else "Авторизация не требуется; по умолчанию доступ только из приватных сетей."
+                    else tr('backend.22')
                 ),
                 "header": "X-Token" if token_required else None,
                 "query": "?token=..." if token_required else None,
             },
             "response_format": {
                 "success": {"ok": True, "message": "{...}", "messages": ["{...}"]},
-                "error": {"ok": False, "error": "человекочитаемая причина"},
+                "error": {"ok": False, "error": tr('backend.23')},
             },
             "message_object": {
                 "id": 123,
                 "chat_id": 0,
                 "dir": "out",
                 "date": 1700000000,
-                "text": "текст",
+                "text": tr('backend.24'),
                 "caption": "",
                 "kind": "text",
                 "media": None,
@@ -533,27 +535,27 @@ class Handler(BaseHTTPRequestHandler):
                 "rev": 1,
             },
             "quickstart": [
-                "1. GET /api/users — список пользователей и их chat_id",
-                "2. POST /api/users/add {\"user_id\": 123} — добавить пользователя",
-                "3. POST /api/users/block {\"chat_id\": 123} — заблокировать",
-                "4. POST /api/send {\"chat_id\": 123, \"text\": \"Привет\"} — отправить текст",
-                "5. POST /api/send_file?chat_id=123 (multipart file) — отправить файл",
-                "6. GET /api/messages?chat_id=123&limit=20 — прочитать входящие",
-                "7. GET /api/media/<message_id> — скачать полученный файл",
+                tr('backend.25'),
+                tr('backend.26'),
+                tr('backend.27'),
+                tr('backend.28'),
+                tr('backend.29'),
+                tr('backend.30'),
+                tr('backend.31'),
             ],
             "endpoints": [
                 {
                     "method": "GET",
                     "path": "/api/help",
-                    "summary": "этот документ со всеми эндпоинтами и примерами",
+                    "summary": tr('backend.32'),
                 },
                 {
                     "method": "GET",
                     "path": "/api/status",
-                    "summary": "состояние бота и чата",
+                    "summary": tr('backend.33'),
                     "response": {
                         "ok": True,
-                        "bot": {"id": 0, "username": "bot", "name": "Имя"},
+                        "bot": {"id": 0, "username": "bot", "name": tr('backend.34')},
                         "chat_id": 0,
                         "chat_ready": True,
                         "connection": "online",
@@ -563,56 +565,56 @@ class Handler(BaseHTTPRequestHandler):
                 {
                     "method": "GET",
                     "path": "/api/users",
-                    "summary": "список пользователей: id, chat_id, имя, username, allowed (не заблокирован), last_seen",
+                    "summary": tr('backend.35'),
                     "response": {"ok": True, "count": 1, "users": ["{...}"]},
                 },
                 {
                     "method": "POST",
                     "path": "/api/users/add",
-                    "summary": "добавить пользователя по user_id или username",
+                    "summary": tr('backend.36'),
                     "body": {"user_id": 123, "username": "@name"},
                     "response": {"ok": True, "user": "{...}"},
                 },
                 {
                     "method": "POST",
                     "path": "/api/users/block",
-                    "summary": "заблокировать: убрать доступ, история сохраняется",
+                    "summary": tr('backend.37'),
                     "body": {"chat_id": 123},
                     "response": {"ok": True, "user": "{...}"},
                 },
                 {
                     "method": "POST",
                     "path": "/api/users/unblock",
-                    "summary": "вернуть доступ ранее добавленному пользователю",
+                    "summary": tr('backend.38'),
                     "body": {"chat_id": 123},
                     "response": {"ok": True, "user": "{...}"},
                 },
                 {
                     "method": "GET",
                     "path": "/api/media/<message_id>",
-                    "summary": "скачать входящий файл/фото/голосовое",
-                    "response": "бинарный файл (Content-Disposition attachment)",
+                    "summary": tr('backend.39'),
+                    "response": tr('backend.40'),
                 },
                 {
                     "method": "GET",
                     "path": "/api/messages?chat_id=123&limit=20&since_id=0",
-                    "summary": "последние сообщения выбранного пользователя (или чата по умолчанию)",
+                    "summary": tr('backend.41'),
                     "query": {
-                        "chat_id": "id пользователя; без него — чат по умолчанию",
-                        "limit": "1..200, по умолчанию 20",
-                        "since_id": "вернуть только сообщения с id больше указанного",
+                        "chat_id": tr('backend.42'),
+                        "limit": tr('backend.43'),
+                        "since_id": tr('backend.44'),
                     },
                     "response": {"ok": True, "chat_id": 123, "messages": ["{...}"]},
                 },
                 {
                     "method": "POST",
                     "path": "/api/send",
-                    "summary": "отправить текст (markdown или plain)",
+                    "summary": tr('backend.45'),
                     "content_types": ["application/json", "application/x-www-form-urlencoded"],
                     "body": {
-                        "text": "обязательный текст сообщения",
-                        "parse": "md (по умолчанию) или plain",
-                        "chat_id": "id пользователя; без него — чат по умолчанию",
+                        "text": tr('backend.46'),
+                        "parse": tr('backend.47'),
+                        "chat_id": tr('backend.42'),
                     },
                     "response": {
                         "ok": True,
@@ -624,24 +626,24 @@ class Handler(BaseHTTPRequestHandler):
                 {
                     "method": "POST",
                     "path": "/api/send_file",
-                    "summary": "отправить файл (тип определяется по имени/MIME)",
+                    "summary": tr('backend.48'),
                     "content_types": ["multipart/form-data", "application/json", "application/octet-stream"],
                     "modes": {
-                        "multipart": "поле file + chat_id + необязательное caption",
-                        "raw_body": "тело запроса целиком, имя в ?name=file.jpg&chat_id=123&caption=...",
+                        "multipart": tr('backend.49'),
+                        "raw_body": tr('backend.50'),
                         "json_base64": {"file_name": "photo.jpg", "file_base64": "…", "chat_id": 123, "caption": "…"},
                         "json_path": {"path": "C:\\\\temp\\\\photo.jpg", "chat_id": 123, "caption": "…"},
                         "json_url": {"url": "https://example.com/photo.jpg", "chat_id": 123, "caption": "…"},
                     },
                     "response": {"ok": True, "message": "{...}", "messages": ["{...}"]},
-                    "notes": "Фото, видео, GIF, .ogg/.opus (голосовое), mp3/m4a/flac (аудио), остальное — документом.",
+                    "notes": tr('backend.51'),
                 },
             ],
             "limits": {
                 "max_file_mb": int(self.app.config.get("max_upload_mb") or 50),
                 "max_request_mb": 80,
                 "max_text_chars": 4096,
-                "receiver": "любой добавленный пользователь по chat_id; без chat_id — чат по умолчанию",
+                "receiver": tr('backend.52'),
             },
             "examples": {
                 "curl_text": (
@@ -664,11 +666,11 @@ class Handler(BaseHTTPRequestHandler):
                 ),
             },
             "notes": [
-                "API работает, пока запущено приложение.",
-                "Все методы доступны и как /send, и как /api/send (префикс /api необязателен).",
-                "Ответ всегда JSON в UTF-8; ошибки — с полем error и HTTP-кодом 4xx/5xx.",
-                "CORS разрешён для всех источников.",
-                "Длинный текст автоматически разбивается на несколько сообщений.",
+                tr('backend.53'),
+                tr('backend.54'),
+                tr('backend.55'),
+                tr('backend.56'),
+                tr('backend.57'),
             ],
             "status": self._status(),
         }
@@ -723,7 +725,7 @@ def create_agent_server(app: Any, host: str = "0.0.0.0", port: int = 8765) -> tu
         try:
             server = Server((host, 0), app)
         except OSError:
-            raise last_error or OSError("Не удалось запустить API")
+            raise last_error or OSError(tr('backend.58'))
     actual_port = server.server_address[1]
     ips = lan_ips()
     urls = [f"http://{ip}:{actual_port}" for ip in ips]
@@ -739,5 +741,5 @@ def create_agent_server(app: Any, host: str = "0.0.0.0", port: int = 8765) -> tu
     }
     thread = threading.Thread(target=server.serve_forever, name="agent-api", daemon=True)
     thread.start()
-    log.info("API для скриптов: %s (в сети: %s)", info["url"], ", ".join(urls) or info["lan_url"])
+    log.info(tr('backend.59'), info["url"], ", ".join(urls) or info["lan_url"])
     return server, info
