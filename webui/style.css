@@ -1208,36 +1208,6 @@ b, strong { font-weight: 650; }
 .chip .chip-x svg { width: 14px; height: 14px; fill: currentColor; }
 .chip .chip-x:hover { background: var(--hover); color: var(--text); }
 
-.fmt-bar {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  margin: 0 2px 4px;
-  opacity: 0.6;
-  transition: opacity 0.15s;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.composer:focus-within .fmt-bar { opacity: 1; }
-.fmt-btn {
-  min-width: 28px;
-  height: 26px;
-  padding: 0 7px;
-  border-radius: 7px;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 600;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-}
-.fmt-btn:hover { background: var(--hover); color: var(--text); }
-.fmt-btn:active { background: var(--accent-soft); color: var(--accent); }
-.fmt-btn svg { width: 15px; height: 15px; fill: currentColor; }
-.fmt-code { font-family: "Cascadia Mono", "Consolas", monospace; font-size: 10.5px; }
-.fmt-sep { width: 1px; height: 14px; background: var(--line); margin: 0 4px; flex: 0 0 auto; }
-.fmt-hint { font-size: 11px; color: var(--dim); white-space: nowrap; flex: 0 0 auto; }
-
 .composer-box {
   display: flex;
   align-items: flex-end;
@@ -2053,7 +2023,6 @@ body.dragging .dropzone { display: grid; }
   .bubble { max-width: 88%; }
   .chat-head { height: 60px; }
   .composer { padding: 6px 9px 10px; }
-  .fmt-hint { display: none; }
   .peer-name { max-width: 52vw; }
   .modal { padding: 8px; }
   .modal-card { border-radius: 15px; }
@@ -2091,7 +2060,6 @@ body.dragging .dropzone { display: grid; }
   .bubble .body { font-size: 14px; }
   .messages { padding: 10px 9px 6px; }
   .composer { padding: 5px 7px 8px; }
-  .fmt-btn { min-width: 25px; height: 24px; padding: 0 5px; }
   .icon-btn { width: 34px; height: 34px; }
   .send-btn { width: 36px; height: 36px; }
   .media img.photo { max-width: 100%; max-height: 240px; }

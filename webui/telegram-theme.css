@@ -788,27 +788,6 @@ body.theme-light .row.out .wave i.on { background: #3f9d4b; }
   position: relative;
 }
 
-/* Панель форматирования — лёгкие чипы над полем */
-.fmt-bar {
-  margin: 0 6px 6px;
-  gap: 2px;
-  padding: 0;
-  opacity: 0.72;
-}
-.composer:focus-within .fmt-bar { opacity: 1; }
-.fmt-btn {
-  min-width: 28px;
-  height: 26px;
-  padding: 0 7px;
-  border-radius: 8px;
-  color: var(--muted);
-  font-size: 13px;
-}
-.fmt-btn:hover { background: var(--hover); color: var(--text); }
-.fmt-btn:active { background: var(--accent-soft); color: var(--accent); }
-.fmt-sep { height: 13px; background: var(--line); }
-.fmt-hint { font-size: 11.5px; color: var(--dim); }
-
 /* Само поле: пилюля как в Telegram Web */
 .composer-box {
   align-items: flex-end;
@@ -1274,7 +1253,6 @@ select.input {
   .bubble { max-width: 88%; }
   .bubble .body { font-size: 14.5px; }
   .composer { padding: 0 8px 10px; }
-  .fmt-hint { display: none; }
   .peer-name { max-width: 52vw; }
   .modal { padding: 8px; }
   .modal-card { border-radius: 14px; }

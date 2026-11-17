@@ -2608,10 +2608,6 @@
       }
     });
 
-    $$('.fmt-btn').forEach((button) => {
-      button.addEventListener('click', () => wrapSelection(button.dataset.fmt));
-    });
-
     document.addEventListener('paste', (event) => {
       if (!state.activeId || isModalOpen(ui.modalSettings) || isModalOpen(ui.modalFind)) return;
       const active = document.activeElement;
