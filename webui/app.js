@@ -159,6 +159,7 @@
     findEmptyText: $('#findEmptyText'),
     lightbox: $('#lightbox'),
     lightboxImg: $('#lightboxImg'),
+    lightboxVideo: $('#lightboxVideo'),
     lightboxDownload: $('#lightboxDownload'),
     selectionBar: $('#selectionBar'),
     selectionCount: $('#selectionCount'),
@@ -993,19 +994,19 @@
     '</div>';
   }
 
-  function photoHtml(msg, label) {
+  function photoHtml(msg, label, animation) {
     const src = mediaSrc(msg);
     return '<div class="media photo-media">' +
       '<img class="photo" src="' + esc(src) + '" data-full="' + esc(src) +
         '" data-download="' + esc(mediaDownloadUrl(msg.id)) + '" alt="' + esc(label || 'Фото') +
-        '" loading="lazy">' +
+        '"' + (animation ? ' data-anim="1"' : '') + ' loading="lazy">' +
     '</div>';
   }
 
   function videoHtml(msg, animation) {
     const src = mediaSrc(msg);
     const attrs = animation
-      ? ' autoplay loop muted playsinline preload="metadata"'
+      ? ' autoplay loop muted playsinline preload="metadata" data-anim="1"'
       : ' controls playsinline preload="metadata"';
     return '<div class="media video-media">' +
       '<video' + attrs + ' src="' + esc(src) + '"></video>' +
@@ -1042,7 +1043,7 @@
     }
     if (kind === 'animation') {
       const isGif = /gif/i.test(String(media.mime_type || '')) || /\.gif$/i.test(name);
-      if (isGif) return photoHtml(msg, 'GIF');
+      if (isGif) return photoHtml(msg, 'GIF', true);
       return videoHtml(msg, true);
     }
     if (kind === 'sticker') {
@@ -2396,15 +2397,45 @@
   /* --------------------------------------------------------------- лайтбокс */
   function openLightbox(src, downloadUrl, alt) {
     if (!src) return;
+    if (ui.lightboxVideo) {
+      ui.lightboxVideo.pause();
+      ui.lightboxVideo.hidden = true;
+      ui.lightboxVideo.removeAttribute('src');
+    }
+    ui.lightboxImg.hidden = false;
+    ui.lightbox.classList.remove('anim');
     ui.lightboxImg.src = src;
     ui.lightboxImg.alt = alt || 'Изображение';
     ui.lightbox.hidden = false;
     if (ui.lightboxClose) ui.lightboxClose.focus();
   }
 
+  function openAnimationLightbox(src, alt) {
+    if (!src || !ui.lightboxVideo) {
+      openLightbox(src, '', alt || 'Анимация');
+      return;
+    }
+    ui.lightboxImg.hidden = true;
+    ui.lightboxImg.removeAttribute('src');
+    ui.lightboxVideo.hidden = false;
+    ui.lightboxVideo.src = src;
+    ui.lightbox.classList.add('anim');
+    ui.lightbox.hidden = false;
+    const played = ui.lightboxVideo.play();
+    if (played && played.catch) played.catch(() => {});
+    if (ui.lightboxClose) ui.lightboxClose.focus();
+  }
+
   function closeLightbox() {
     ui.lightbox.hidden = true;
+    ui.lightbox.classList.remove('anim');
     ui.lightboxImg.removeAttribute('src');
+    ui.lightboxImg.hidden = false;
+    if (ui.lightboxVideo) {
+      ui.lightboxVideo.pause();
+      ui.lightboxVideo.removeAttribute('src');
+      ui.lightboxVideo.hidden = true;
+    }
   }
 
   /* --------------------------------------------------------------- сайдбар */
@@ -2691,8 +2722,16 @@
 
       const photo = target.closest('img.photo');
       if (photo) {
-        openLightbox(photo.dataset.full || photo.currentSrc || photo.src,
-          photo.dataset.download || '', photo.alt);
+        const src = photo.dataset.full || photo.currentSrc || photo.src;
+        if (photo.dataset.anim === '1') openAnimationLightbox(src, photo.alt);
+        else openLightbox(src, photo.dataset.download || '', photo.alt);
+        return;
+      }
+
+      const animation = target.closest('video[data-anim="1"]');
+      if (animation) {
+        event.preventDefault();
+        openAnimationLightbox(animation.currentSrc || animation.src, 'Анимация');
       }
     });
 
@@ -3034,7 +3073,7 @@
     /* лайтбокс */
     ui.lightbox.addEventListener('click', (event) => {
       const target = event.target;
-      if (target.closest('.lb-close, .lb-download')) return;
+      if (target.closest('.lb-close, .lb-download, video')) return;
       closeLightbox();
     });
     ui.lightboxClose.addEventListener('click', (event) => {

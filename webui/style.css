@@ -1906,6 +1906,22 @@ select.input option { background: var(--panel); color: var(--text); }
   box-shadow: 0 14px 60px rgba(0, 0, 0, 0.6);
   background: rgba(255, 255, 255, 0.04);
 }
+.lightbox video {
+  max-width: min(68vw, 760px);
+  max-height: 68vh;
+  border-radius: 10px;
+  box-shadow: 0 14px 60px rgba(0, 0, 0, 0.6);
+  background: #000;
+  outline: none;
+}
+.lightbox.anim img,
+.lightbox.anim video {
+  width: 92vw;
+  height: auto;
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+}
 .lb-close {
   position: absolute;
   top: 16px;
@@ -2080,6 +2096,8 @@ body.dragging .dropzone { display: grid; }
   .lb-download { bottom: 12px; }
   .lightbox { padding: 12px; }
   .lightbox img { max-width: 88vw; max-height: 70vh; }
+  .lightbox video { max-width: 88vw; max-height: 70vh; }
+  .lightbox.anim img, .lightbox.anim video { width: 96vw; max-width: 96vw; max-height: 82vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
