@@ -1,9 +1,13 @@
 """Markdown -> Telegram HTML.
 
 Telegram принимает разметку в parse_mode=HTML, но набор тегов ограничен:
-<b>, <i>, <u>, <s>, <code>, <pre>, <a>, <blockquote>, <tg-spoiler>.
-Здесь простой, но аккуратный конвертер «человеческого» markdown в этот набор
-плюс разбиение длинных сообщений на части по лимиту 4096 символов.
+<b>, <i>, <u>, <s>, <code>, <pre>, <a>, <blockquote>, <blockquote expandable>,
+<tg-spoiler>. Здесь простой, но аккуратный конвертер «человеческого» markdown
+в этот набор плюс разбиение длинных сообщений на части по лимиту 4096 символов.
+
+Цитаты: `> текст` — обычная, `>! текст` — сворачиваемая (Telegram показывает
+первые строки и «Показать полностью»). Подряд идущие строки одного вида
+собираются в один блок.
 """
 
 from __future__ import annotations
@@ -112,19 +116,34 @@ def md_to_tg_html(markdown: str) -> str:
     # 3. строчные блоки: заголовки, цитаты, списки, разделители
     result: list[str] = []
     quote_buf: list[str] = []
+    expandable_buf: list[str] = []
 
     def flush_quote() -> None:
         if quote_buf:
             result.append("<blockquote>" + "\n".join(quote_buf) + "</blockquote>")
             quote_buf.clear()
 
+    def flush_expandable() -> None:
+        if expandable_buf:
+            result.append(
+                '<blockquote expandable>' + "\n".join(expandable_buf) + "</blockquote>"
+            )
+            expandable_buf.clear()
+
     for line in text.split("\n"):
         stripped = line.strip()
+        if stripped.startswith("&gt;!"):
+            body = stripped[5:]
+            flush_quote()
+            expandable_buf.append(body[1:] if body.startswith(" ") else body)
+            continue
         if stripped.startswith("&gt;"):
             body = stripped[4:]
+            flush_expandable()
             quote_buf.append(body[1:] if body.startswith(" ") else body)
             continue
         flush_quote()
+        flush_expandable()
 
         if _HR.match(stripped):
             result.append("──────────")
@@ -206,6 +225,9 @@ if __name__ == "__main__":  # маленький self-test
 
 > цитата
 > вторая строка
+
+>! сворачиваемая
+>! вторая строка
 
 - пункт
 1. первый

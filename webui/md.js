@@ -165,6 +165,7 @@
     const out = [];
     let para = [];
     let quote = [];
+    let details = null;
     let list = null;
 
     const flushPara = () => {
@@ -176,6 +177,16 @@
       if (!quote.length) return;
       out.push('<blockquote class="md-quote">' + quote.map(inline).join('<br>') + '</blockquote>');
       quote = [];
+    };
+    const flushDetails = () => {
+      if (!details || !details.length) { details = null; return; }
+      out.push(
+        '<details class="md-details">' +
+          '<summary class="md-details-summary">Показать полностью</summary>' +
+          '<div class="md-quote md-details-body">' + details.map(inline).join('<br>') + '</div>' +
+        '</details>'
+      );
+      details = null;
     };
     const flushList = () => {
       if (!list) return;
@@ -190,6 +201,7 @@
     const flushAll = () => {
       flushPara();
       flushQuote();
+      flushDetails();
       flushList();
     };
 
@@ -224,9 +236,19 @@
         out.push('<hr class="md-hr">');
         continue;
       }
+      const expandable = trimmed.match(/^>!\s?(.*)$/);
+      if (expandable) {
+        flushPara();
+        flushQuote();
+        flushList();
+        if (!details) details = [];
+        details.push(expandable[1]);
+        continue;
+      }
       if (/^>\s?/.test(trimmed)) {
         flushPara();
         flushList();
+        flushDetails();
         quote.push(trimmed.replace(/^>\s?/, ''));
         continue;
       }
@@ -235,6 +257,7 @@
       if (ul || ol) {
         flushPara();
         flushQuote();
+        flushDetails();
         const type = ul ? 'ul' : 'ol';
         if (!list || list.type !== type) {
           flushList();
@@ -246,6 +269,7 @@
 
       flushQuote();
       flushList();
+      flushDetails();
       para.push(line);
     }
     flushAll();
