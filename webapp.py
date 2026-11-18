@@ -387,6 +387,22 @@ class WebApp:
         self.ensure_avatar_async(user_id)
         self.maybe_auto_transcribe(record)
         self.notify(record)
+        if not edited and self._is_ping(record.get("text") or ""):
+            self._reply_ping(chat_id)
+
+    @staticmethod
+    def _is_ping(text: str) -> bool:
+        """Команда /ping или /ping@botname (регистр не важен)."""
+        parts = str(text or "").strip().split()
+        if not parts:
+            return False
+        command = parts[0].split("@", 1)[0].lower()
+        return command == "/ping"
+
+    def _reply_ping(self, chat_id: int) -> None:
+        _messages, error = self.send_text(chat_id, tr("backend.213"), plain=True)
+        if error:
+            log.warning(tr('backend.214'), error=error)
 
     def notify(self, record: dict[str, Any]) -> None:
         # В web-версии уведомления только внутри интерфейса; здесь заглушка.
